@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import { connectDB } from "./config/db.js";
 import { notFound, globalErrorHandler } from "./middleware/errorMiddleware.js";
+import authRoutes from "./routes/authRoutes.js";
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(express.json());
 app.get("/api/health", (req, res) => res.json({ ok: true }));
 
 // (routes will go here)
+app.use("/api/auth", authRoutes);
 
 // 404 + error handlers
 app.use(notFound);
