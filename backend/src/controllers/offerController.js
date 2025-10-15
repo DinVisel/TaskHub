@@ -45,3 +45,43 @@ export const getOffersForTask = asyncHandler(async (req, res) => {
 
 	res.json({ offers });
 });
+
+export const acceptOffer = asyncHandler(async (req, res) => {
+	const { offerId } = req.params;
+	const offer = await Offer.findById(offerId);
+	if (!offer) throw new AppError("Offer not found", 404);
+
+	const task = await Task.findById(offer.taskId);
+	if (!task) throw new AppError("Task not found", 404);
+
+	if (task.postedBy.toString() !== req.user.id) {
+		throw new AppError("Not authorized to accept offer for this task", 403);
+	}
+
+	offer.status = "accepted";
+	await offer.save();
+
+	task.status = "in_progress";
+	task.assignedTo = offer.applicantId;
+	await task.save();
+
+	res.json({ message: "Offer accepted", offer });
+});
+
+export const rejectOffer = asyncHandler(async (req, res) => {
+	const { offerId } = req.params;
+	const offer = await Offer.findById(offerId);
+	if (!offer) throw new AppError("Offer not found", 404);
+
+	const task = await Task.findById(offer.taskId);
+	if (!task) throw new AppError("Task not found", 404);
+
+	if (task.postedBy.toString() !== req.user.id) {
+		throw new AppError("Not authorized", 403);
+	}
+
+	offer.status = "rejected";
+	await offer.save();
+
+	res.json({ message: "Offer rejected", offer });
+});

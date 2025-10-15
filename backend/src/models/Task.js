@@ -23,6 +23,11 @@ const taskSchema = new mongoose.Schema(
 				lng: Number,
 			},
 		},
+		assignedTo: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "User",
+			default: null,
+		},
 	},
 	{ timestamps: true }
 );
