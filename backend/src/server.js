@@ -4,6 +4,7 @@ import cors from "cors";
 import { connectDB } from "./config/db.js";
 import { notFound, globalErrorHandler } from "./middleware/errorMiddleware.js";
 import authRoutes from "./routes/authRoutes.js";
+import taskRoutes from "./routes/taskRoutes.js";
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.get("/api/health", (req, res) => res.json({ ok: true }));
 
 // (routes will go here)
 app.use("/api/auth", authRoutes);
+app.use("/api/tasks", taskRoutes);
 
 // 404 + error handlers
 app.use(notFound);
