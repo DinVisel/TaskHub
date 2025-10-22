@@ -1,11 +1,8 @@
-import React, { useContext, useEffect, useState } from "react";
-import { View, Text, Button, FlatList, StyleSheet } from "react-native";
-import { AuthContext } from "../context/AuthContext";
-import { router } from "expo-router";
-import api from "../api/api";
+import React, { useEffect, useState } from "react";
+import { View, Text, FlatList, StyleSheet } from "react-native";
+import api from "../../api/api";
 
 export default function Home() {
-	const { user, logout } = useContext(AuthContext);
 	const [tasks, setTasks] = useState([]);
 
 	useEffect(() => {
@@ -20,12 +17,9 @@ export default function Home() {
 		fetchTasks();
 	}, []);
 
-	if (!user) return router.replace("/login");
-
 	return (
 		<View style={styles.container}>
-			<Text style={styles.header}>Welcome, {user.name}</Text>
-			<Button title='Logout' onPress={logout} />
+			<Text style={styles.header}>Available Tasks</Text>
 			<FlatList
 				data={tasks}
 				keyExtractor={(item) => item._id}
@@ -41,8 +35,13 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-	container: { flex: 1, padding: 20 },
+	container: { flex: 1, padding: 20, backgroundColor: "#fff" },
 	header: { fontSize: 20, fontWeight: "bold", marginBottom: 10 },
-	taskCard: { padding: 10, borderBottomWidth: 1, borderBottomColor: "#ddd" },
-	taskTitle: { fontSize: 16, fontWeight: "bold" },
+	taskCard: {
+		backgroundColor: "#f9f9f9",
+		padding: 12,
+		borderRadius: 10,
+		marginBottom: 10,
+	},
+	taskTitle: { fontWeight: "bold", fontSize: 16 },
 });
