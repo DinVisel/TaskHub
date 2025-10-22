@@ -19,10 +19,7 @@ export default function Account() {
 				<Text style={styles.text}>Name: {user?.name}</Text>
 				<Text style={styles.text}>Email: {user?.email}</Text>
 
-				<Button
-					title='💬 Messages'
-					onPress={() => router.push("/(tabs)/messages")}
-				/>
+				<Button title='💬 Messages' onPress={() => router.push("/chat/messages")} />
 				<View style={{ marginVertical: 10 }} />
 				<Button title='Logout' color='#FF3B30' onPress={handleLogout} />
 			</View>
