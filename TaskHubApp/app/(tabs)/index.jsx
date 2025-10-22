@@ -6,6 +6,7 @@ import {
 	FlatList,
 	StyleSheet,
 	StatusBar,
+	TouchableOpacity,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import api from "../../api/api";
@@ -51,20 +52,28 @@ export default function Home() {
 				<Text style={styles.subHeader}>Find local help or offer your skills</Text>
 			</Animated.View>
 
+			{/*Chat Icon*/}
+			<TouchableOpacity onPress={() => router.push(`/chat/${item._id}`)}>
+				<View style={styles.taskCard}>
+					<Text style={styles.taskTitle}>{item.title}</Text>
+					<Text>{item.description}</Text>
+				</View>
+			</TouchableOpacity>
+
 			{/* Scrollable Content */}
 			<Animated.FlatList
-				data={tasks}
-				keyExtractor={(item) => item._id}
-				contentContainerStyle={{ paddingTop: 10, paddingHorizontal: 20 }}
-				onScroll={Animated.event(
-					[{ nativeEvent: { contentOffset: { y: scrollY } } }],
-					{ useNativeDriver: false }
-				)}
+				data={threads}
+				keyExtractor={(item) => item.taskId}
 				renderItem={({ item }) => (
-					<View style={styles.taskCard}>
-						<Text style={styles.taskTitle}>{item.title}</Text>
-						<Text style={styles.taskDesc}>{item.description}</Text>
-					</View>
+					<TouchableOpacity
+						style={styles.thread}
+						onPress={() => router.push(`/chat/${item.taskId}`)}
+					>
+						<Text style={styles.taskTitle}>{item.taskTitle}</Text>
+						<Text style={styles.preview}>
+							{item.lastMessage || "No messages yet"}
+						</Text>
+					</TouchableOpacity>
 				)}
 			/>
 		</SafeAreaView>

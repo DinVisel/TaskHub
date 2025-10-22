@@ -14,10 +14,18 @@ export default function Account() {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<Text style={styles.header}>My Account</Text>
-			<Text style={styles.text}>Name: {user?.name}</Text>
-			<Text style={styles.text}>Email: {user?.email}</Text>
-			<Button title='Logout' onPress={handleLogout} />
+			<View style={styles.container}>
+				<Text style={styles.header}>My Account</Text>
+				<Text style={styles.text}>Name: {user?.name}</Text>
+				<Text style={styles.text}>Email: {user?.email}</Text>
+
+				<Button
+					title='💬 Messages'
+					onPress={() => router.push("/(tabs)/messages")}
+				/>
+				<View style={{ marginVertical: 10 }} />
+				<Button title='Logout' color='#FF3B30' onPress={handleLogout} />
+			</View>
 		</SafeAreaView>
 	);
 }

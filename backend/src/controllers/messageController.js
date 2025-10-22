@@ -6,52 +6,80 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 // permission check: can user chat in this task?
 const canChat = async (userId, taskId) => {
-  const task = await Task.findById(taskId);
-  if (!task) return { ok: false, reason: "Task not found" };
+	const task = await Task.findById(taskId);
+	if (!task) return { ok: false, reason: "Task not found" };
 
-  // poster can always view
-  if (task.postedBy.toString() === userId) return { ok: true, task };
+	// poster can always view
+	if (task.postedBy.toString() === userId) return { ok: true, task };
 
-  // assigned worker can view
-  if (task.assignedTo?.toString() === userId) return { ok: true, task };
+	// assigned worker can view
+	if (task.assignedTo?.toString() === userId) return { ok: true, task };
 
-  // any applicant (with an offer) can view to negotiate
-  const offer = await Offer.findOne({ taskId, applicantId: userId });
-  if (offer) return { ok: true, task };
+	// any applicant (with an offer) can view to negotiate
+	const offer = await Offer.findOne({ taskId, applicantId: userId });
+	if (offer) return { ok: true, task };
 
-  return { ok: false, reason: "Not allowed" };
+	return { ok: false, reason: "Not allowed" };
 };
 
 // GET /api/messages/:taskId  -> history for a task
 export const getTaskMessages = asyncHandler(async (req, res) => {
-  const { taskId } = req.params;
-  const { ok, reason } = await canChat(req.user.id, taskId);
-  if (!ok) throw new AppError(reason, 403);
+	const { taskId } = req.params;
+	const { ok, reason } = await canChat(req.user.id, taskId);
+	if (!ok) throw new AppError(reason, 403);
 
-  const messages = await Message.find({ taskId })
-    .sort({ createdAt: 1 })
-    .populate("senderId", "name")
-    .populate("receiverId", "name");
+	const messages = await Message.find({ taskId })
+		.sort({ createdAt: 1 })
+		.populate("senderId", "name")
+		.populate("receiverId", "name");
 
-  res.json({ messages });
+	res.json({ messages });
 });
 
 // POST /api/messages  -> send via REST (fallback/testing)
 export const sendMessageREST = asyncHandler(async (req, res) => {
-  const { taskId, receiverId, content } = req.body;
-  if (!taskId || !receiverId || !content) {
-    throw new AppError("taskId, receiverId, content are required", 400);
-  }
+	const { taskId, receiverId, content } = req.body;
+	if (!taskId || !receiverId || !content) {
+		throw new AppError("taskId, receiverId, content are required", 400);
+	}
 
-  const { ok, reason } = await canChat(req.user.id, taskId);
-  if (!ok) throw new AppError(reason, 403);
+	const { ok, reason } = await canChat(req.user.id, taskId);
+	if (!ok) throw new AppError(reason, 403);
 
-  const msg = await Message.create({
-    taskId,
-    senderId: req.user.id,
-    receiverId,
-    content
-  });
+	const msg = await Message.create({
+		taskId,
+		senderId: req.user.id,
+		receiverId,
+		content,
+	});
 
-  res.status(201).json({ message: msg });
+	res.status(201).json({ message: msg });
+});
+
+export const getUserThreads = asyncHandler(async (req, res) => {
+	const userId = req.user.id;
+
+	const threads = await Message.aggregate([
+		{ $match: { $or: [{ senderId: userId }, { receiverId: userId }] } },
+		{ $sort: { createdAt: -1 } },
+		{
+			$group: {
+				_id: "$taskId",
+				lastMessage: { $first: "$content" },
+			},
+		},
+	]);
+
+	const populated = await Promise.all(
+		threads.map(async (t) => {
+			const task = await Task.findById(t._id);
+			return {
+				taskId: t._id,
+				taskTitle: task?.title || "Unknown Task",
+				lastMessage: t.lastMessage,
+			};
+		})
+	);
+
+	res.json({ threads: populated });
 });
