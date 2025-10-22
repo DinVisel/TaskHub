@@ -1,18 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { View, TextInput, Button, Text, StyleSheet } from "react-native";
-import api from "../api/api";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AuthContext } from "../context/AuthContext";
 
 export default function LoginScreen({ navigation }) {
+	const { login } = useContext(AuthContext); // 🧠 use global login()
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState("");
 
 	const handleLogin = async () => {
 		try {
-			const res = await api.post("/auth/login", { email, password });
-			await AsyncStorage.setItem("token", res.data.token);
-			navigation.navigate("Home");
+			await login(email, password); // AuthContext handles API + token storage
+			navigation.navigate("Home"); // redirect on success
 		} catch (err) {
 			setError(err.response?.data?.message || "Login failed");
 		}
@@ -20,23 +19,49 @@ export default function LoginScreen({ navigation }) {
 
 	return (
 		<View style={styles.container}>
-			<Text>Email</Text>
-			<TextInput style={styles.input} value={email} onChangeText={setEmail} />
-			<Text>Password</Text>
+			<Text style={styles.title}>Welcome Back</Text>
+
 			<TextInput
 				style={styles.input}
+				placeholder='Email'
+				value={email}
+				onChangeText={setEmail}
+				autoCapitalize='none'
+			/>
+
+			<TextInput
+				style={styles.input}
+				placeholder='Password'
 				secureTextEntry
 				value={password}
 				onChangeText={setPassword}
 			/>
-			{error ? <Text style={{ color: "red" }}>{error}</Text> : null}
+
+			{error ? <Text style={styles.error}>{error}</Text> : null}
+
 			<Button title='Login' onPress={handleLogin} />
-			<Button title='Register' onPress={() => navigation.navigate("Register")} />
+			<Button
+				title='Create new account'
+				onPress={() => navigation.navigate("Register")}
+			/>
 		</View>
 	);
 }
 
 const styles = StyleSheet.create({
-	container: { flex: 1, padding: 20, justifyContent: "center" },
-	input: { borderWidth: 1, borderColor: "#ccc", padding: 10, marginBottom: 10 },
+	container: { flex: 1, justifyContent: "center", padding: 20 },
+	title: {
+		fontSize: 22,
+		fontWeight: "bold",
+		marginBottom: 20,
+		textAlign: "center",
+	},
+	input: {
+		borderWidth: 1,
+		borderColor: "#ccc",
+		borderRadius: 6,
+		padding: 10,
+		marginBottom: 12,
+	},
+	error: { color: "red", marginBottom: 10, textAlign: "center" },
 });
