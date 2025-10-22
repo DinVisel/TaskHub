@@ -1,28 +1,33 @@
-import React, { useContext, useEffect } from "react";
-import { Stack, Slot, Redirect } from "expo-router";
+import React, { useContext } from "react";
+import { Stack } from "expo-router";
 import { AuthProvider, AuthContext } from "../context/AuthContext";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
-function AuthGuard() {
+function AuthenticatedStack() {
 	const { user, loading } = useContext(AuthContext);
 
-	if (loading) return null; // show splash later
+	if (loading) return null; // TODO: add splash screen
 
-	// If not logged in → send to login
-	if (!user) return <Redirect href='/login' />;
+	if (!user) {
+		return (
+			<Stack screenOptions={{ headerShown: false }}>
+				<Stack.Screen name='login' />
+				<Stack.Screen name='register' />
+			</Stack>
+		);
+	}
 
-	// Otherwise → show main tabs
-	return <Slot />;
+	return (
+		<Stack screenOptions={{ headerShown: false }}>
+			<Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+		</Stack>
+	);
 }
 
 export default function RootLayout() {
 	return (
 		<AuthProvider>
-			<Stack screenOptions={{ headerShown: false }}>
-				<Stack.Screen name='(tabs)' options={{ headerShown: false }} />
-				<Stack.Screen name='login' />
-				<Stack.Screen name='register' />
-			</Stack>
-			<AuthGuard />
+			<AuthenticatedStack />
 		</AuthProvider>
 	);
 }

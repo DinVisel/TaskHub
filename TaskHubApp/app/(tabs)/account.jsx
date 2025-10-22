@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { View, Text, Button, StyleSheet } from "react-native";
 import { AuthContext } from "../../context/AuthContext";
 import { router } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Account() {
 	const { user, logout } = useContext(AuthContext);
@@ -12,12 +13,12 @@ export default function Account() {
 	};
 
 	return (
-		<View style={styles.container}>
+		<SafeAreaView style={styles.container}>
 			<Text style={styles.header}>My Account</Text>
 			<Text style={styles.text}>Name: {user?.name}</Text>
 			<Text style={styles.text}>Email: {user?.email}</Text>
 			<Button title='Logout' onPress={handleLogout} />
-		</View>
+		</SafeAreaView>
 	);
 }
 

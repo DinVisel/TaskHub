@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet } from "react-native";
 import api from "../../api/api";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function PostTask() {
 	const [title, setTitle] = useState("");
@@ -19,7 +20,7 @@ export default function PostTask() {
 	};
 
 	return (
-		<View style={styles.container}>
+		<SafeAreaView style={styles.container}>
 			<Text style={styles.title}>Post a New Task</Text>
 			<TextInput
 				style={styles.input}
@@ -36,7 +37,7 @@ export default function PostTask() {
 			/>
 			<Button title='Submit' onPress={handlePost} />
 			{message ? <Text style={styles.message}>{message}</Text> : null}
-		</View>
+		</SafeAreaView>
 	);
 }
 

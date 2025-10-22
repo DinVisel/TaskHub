@@ -1,9 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, StyleSheet } from "react-native";
+import React, { useRef } from "react";
+import {
+	Animated,
+	View,
+	Text,
+	FlatList,
+	StyleSheet,
+	StatusBar,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import api from "../../api/api";
+import { useEffect, useState } from "react";
 
 export default function Home() {
 	const [tasks, setTasks] = useState([]);
+
+	const scrollY = useRef(new Animated.Value(0)).current;
 
 	useEffect(() => {
 		const fetchTasks = async () => {
@@ -17,31 +28,87 @@ export default function Home() {
 		fetchTasks();
 	}, []);
 
+	const headerHeight = scrollY.interpolate({
+		inputRange: [0, 80],
+		outputRange: [120, 60],
+		extrapolate: "clamp",
+	});
+
+	const headerFontSize = scrollY.interpolate({
+		inputRange: [0, 80],
+		outputRange: [28, 20],
+		extrapolate: "clamp",
+	});
+
 	return (
-		<View style={styles.container}>
-			<Text style={styles.header}>Available Tasks</Text>
-			<FlatList
+		<SafeAreaView style={{ flex: 1, backgroundColor: "#fdfdfd" }}>
+			<StatusBar barStyle='dark-content' />
+			{/* Animated Header */}
+			<Animated.View style={[styles.header, { height: headerHeight }]}>
+				<Animated.Text style={[styles.headerTitle, { fontSize: headerFontSize }]}>
+					TaskHub
+				</Animated.Text>
+				<Text style={styles.subHeader}>Find local help or offer your skills</Text>
+			</Animated.View>
+
+			{/* Scrollable Content */}
+			<Animated.FlatList
 				data={tasks}
 				keyExtractor={(item) => item._id}
+				contentContainerStyle={{ paddingTop: 10, paddingHorizontal: 20 }}
+				onScroll={Animated.event(
+					[{ nativeEvent: { contentOffset: { y: scrollY } } }],
+					{ useNativeDriver: false }
+				)}
 				renderItem={({ item }) => (
 					<View style={styles.taskCard}>
 						<Text style={styles.taskTitle}>{item.title}</Text>
-						<Text>{item.description}</Text>
+						<Text style={styles.taskDesc}>{item.description}</Text>
 					</View>
 				)}
 			/>
-		</View>
+		</SafeAreaView>
 	);
 }
 
 const styles = StyleSheet.create({
-	container: { flex: 1, padding: 20, backgroundColor: "#fff" },
-	header: { fontSize: 20, fontWeight: "bold", marginBottom: 10 },
+	header: {
+		alignItems: "center",
+		justifyContent: "center",
+		backgroundColor: "#007AFF",
+		borderBottomLeftRadius: 20,
+		borderBottomRightRadius: 20,
+		elevation: 4,
+		shadowColor: "#000",
+		shadowOpacity: 0.2,
+		shadowOffset: { width: 0, height: 2 },
+		shadowRadius: 3,
+	},
+	headerTitle: {
+		color: "white",
+		fontWeight: "bold",
+		letterSpacing: 0.5,
+	},
+	subHeader: {
+		color: "rgba(255,255,255,0.85)",
+		marginTop: 4,
+		fontSize: 13,
+	},
 	taskCard: {
-		backgroundColor: "#f9f9f9",
-		padding: 12,
+		backgroundColor: "#fff",
+		padding: 14,
 		borderRadius: 10,
 		marginBottom: 10,
+		shadowColor: "#000",
+		shadowOpacity: 0.05,
+		shadowRadius: 3,
 	},
-	taskTitle: { fontWeight: "bold", fontSize: 16 },
+	taskTitle: {
+		fontWeight: "bold",
+		fontSize: 16,
+		marginBottom: 4,
+	},
+	taskDesc: {
+		color: "#555",
+	},
 });
