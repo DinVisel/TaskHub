@@ -1,34 +1,85 @@
 import React, { useContext } from "react";
-import { View, Text, Button, StyleSheet } from "react-native";
+import {
+	View,
+	Text,
+	Button,
+	StyleSheet,
+	Image,
+	TouchableOpacity,
+} from "react-native";
 import { AuthContext } from "../../context/AuthContext";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
+import { colors, spacing } from "@/theme";
 
 export default function Account() {
 	const { user, logout } = useContext(AuthContext);
 
-	const handleLogout = async () => {
-		await logout();
-		router.replace("/login");
-	};
-
 	return (
-		<SafeAreaView style={styles.container}>
-			<View style={styles.container}>
-				<Text style={styles.header}>My Account</Text>
-				<Text style={styles.text}>Name: {user?.name}</Text>
-				<Text style={styles.text}>Email: {user?.email}</Text>
+		<View style={styles.container}>
+			<LinearGradient
+				colors={[colors.primary, colors.secondary]}
+				style={styles.header}
+			>
+				<Image
+					source={{ uri: user?.avatar || "https://i.pravatar.cc/100" }}
+					style={styles.avatar}
+				/>
+				<Text style={styles.name}>{user?.name}</Text>
+				<Text style={styles.email}>{user?.email}</Text>
+			</LinearGradient>
 
-				<Button title='💬 Messages' onPress={() => router.push("/chat/messages")} />
-				<View style={{ marginVertical: 10 }} />
-				<Button title='Logout' color='#FF3B30' onPress={handleLogout} />
-			</View>
-		</SafeAreaView>
+			<TouchableOpacity
+				style={styles.button}
+				onPress={() => router.push("/(tabs)/messages")}
+			>
+				<Text style={styles.buttonText}>💬 Messages</Text>
+			</TouchableOpacity>
+
+			<TouchableOpacity
+				style={[styles.button, { backgroundColor: "#FF3B30" }]}
+				onPress={logout}
+			>
+				<Text style={styles.buttonText}>Logout</Text>
+			</TouchableOpacity>
+		</View>
 	);
 }
 
 const styles = StyleSheet.create({
-	container: { flex: 1, justifyContent: "center", alignItems: "center" },
-	header: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
-	text: { fontSize: 16, marginBottom: 10 },
+	container: {
+		flex: 1,
+		backgroundColor: colors.background,
+		alignItems: "center",
+	},
+	header: {
+		width: "100%",
+		alignItems: "center",
+		paddingVertical: 60,
+		borderBottomLeftRadius: 30,
+		borderBottomRightRadius: 30,
+	},
+	avatar: {
+		width: 100,
+		height: 100,
+		borderRadius: 50,
+		borderWidth: 3,
+		borderColor: "#fff",
+	},
+	name: {
+		color: "white",
+		fontSize: 20,
+		fontWeight: "bold",
+		marginTop: spacing.sm,
+	},
+	email: { color: "rgba(255,255,255,0.8)", fontSize: 14 },
+	button: {
+		marginTop: spacing.lg,
+		backgroundColor: colors.primary,
+		paddingVertical: 14,
+		paddingHorizontal: 30,
+		borderRadius: 30,
+	},
+	buttonText: { color: "white", fontWeight: "bold", fontSize: 16 },
 });

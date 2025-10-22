@@ -1,8 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Animated, View, Text, StyleSheet, StatusBar, TouchableOpacity } from "react-native";
+import {
+	Animated,
+	View,
+	Text,
+	StyleSheet,
+	StatusBar,
+	TouchableOpacity,
+} from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import api from "../../api/api";
+import { colors, spacing, fonts } from "../../theme.js";
 
 export default function Home() {
 	const [tasks, setTasks] = useState([]);
@@ -34,7 +43,15 @@ export default function Home() {
 	});
 
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: "#fdfdfd" }}>
+		<SafeAreaView style={styles.container}>
+			<LinearGradient
+				colors={[colors.secondary, colors.primary]}
+				style={styles.header}
+			>
+				<Text style={styles.headerTitle}>Find Help Nearby</Text>
+				<Text style={styles.headerSubtitle}>Exchange skills in your community</Text>
+			</LinearGradient>
+
 			<StatusBar barStyle='dark-content' />
 			{/* Animated Header */}
 			<Animated.View style={[styles.header, { height: headerHeight }]}>
@@ -44,90 +61,89 @@ export default function Home() {
 				<Text style={styles.subHeader}>Find local help or offer your skills</Text>
 			</Animated.View>
 
-                        {/* Scrollable Content */}
-                        <Animated.FlatList
-                                style={{ flex: 1 }}
-                                data={tasks}
-                                keyExtractor={(item) => item._id}
-                                renderItem={({ item }) => (
-                                        <TouchableOpacity
-                                                style={styles.thread}
-                                                onPress={() => router.push(`/chat/${item._id}`)}
-                                        >
-                                                <View style={styles.taskCard}>
-                                                        <Text style={styles.taskTitle}>{item.title}</Text>
-                                                        <Text style={styles.taskDesc}>{item.description}</Text>
-                                                </View>
-                                        </TouchableOpacity>
-                                )}
-                                onScroll={Animated.event(
-                                        [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-                                        { useNativeDriver: false }
-                                )}
-                                contentContainerStyle={styles.listContent}
-                                showsVerticalScrollIndicator={false}
-                                ListEmptyComponent={() => (
-                                        <View style={styles.emptyState}>
-                                                <Text style={styles.emptyText}>No tasks available yet</Text>
-                                        </View>
-                                )}
-                        />
-                </SafeAreaView>
-        );
+			{/* Scrollable Content */}
+			<Animated.FlatList
+				style={{ flex: 1 }}
+				data={tasks}
+				keyExtractor={(item) => item._id}
+				contentContainerStyle={{ padding: spacing.md }}
+				renderItem={({ item }) => (
+					<TouchableOpacity
+						onPress={() => router.push(`/chat/${item._id}`)}
+						style={styles.card}
+					>
+						<View style={styles.row}>
+							<Image
+								source={{ uri: item.ownerAvatar || "https://i.pravatar.cc/80" }}
+								style={styles.avatar}
+							/>
+							<View style={{ flex: 1 }}>
+								<Text style={styles.title}>{item.title}</Text>
+								<Text style={styles.subtitle}>{item.category || "General"}</Text>
+							</View>
+						</View>
+						<Text style={styles.desc} numberOfLines={2}>
+							{item.description}
+						</Text>
+					</TouchableOpacity>
+				)}
+			/>
+		</SafeAreaView>
+	);
 }
 
 const styles = StyleSheet.create({
+	container: { flex: 1, backgroundColor: colors.background },
 	header: {
+		paddingTop: 60,
+		paddingBottom: 30,
 		alignItems: "center",
-		justifyContent: "center",
-		backgroundColor: "#007AFF",
-		borderBottomLeftRadius: 20,
-		borderBottomRightRadius: 20,
-		elevation: 4,
-		shadowColor: "#000",
-		shadowOpacity: 0.2,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 3,
+		borderBottomLeftRadius: 25,
+		borderBottomRightRadius: 25,
 	},
 	headerTitle: {
 		color: "white",
 		fontWeight: "bold",
-		letterSpacing: 0.5,
+		fontSize: 26,
 	},
-	subHeader: {
-		color: "rgba(255,255,255,0.85)",
-		marginTop: 4,
-		fontSize: 13,
+	headerSubtitle: {
+		color: "rgba(255,255,255,0.8)",
+		marginTop: 6,
+		fontSize: 14,
 	},
-        listContent: {
-                paddingHorizontal: 20,
-                paddingTop: 140,
-                paddingBottom: 20,
-        },
-        taskCard: {
-                backgroundColor: "#fff",
-                padding: 14,
-                borderRadius: 10,
-                shadowColor: "#000",
-                shadowOpacity: 0.05,
-                shadowRadius: 3,
-        },
-        taskTitle: {
-                fontWeight: "bold",
-                fontSize: 16,
-                marginBottom: 4,
-        },
-        taskDesc: {
-                color: "#555",
-        },
-        thread: {
-                marginBottom: 16,
-        },
-        emptyState: {
-                marginTop: 100,
-                alignItems: "center",
-        },
-        emptyText: {
-                color: "#888",
-        },
+	card: {
+		backgroundColor: colors.card,
+		borderRadius: 16,
+		padding: spacing.md,
+		marginBottom: spacing.md,
+		shadowColor: "#000",
+		shadowOpacity: 0.1,
+		shadowOffset: { width: 0, height: 4 },
+		shadowRadius: 6,
+		elevation: 3,
+	},
+	row: {
+		flexDirection: "row",
+		alignItems: "center",
+		marginBottom: spacing.sm,
+	},
+	avatar: {
+		width: 48,
+		height: 48,
+		borderRadius: 24,
+		marginRight: spacing.md,
+	},
+	title: {
+		fontSize: fonts.subtitle,
+		fontWeight: "bold",
+		color: colors.text,
+	},
+	subtitle: {
+		color: colors.subtext,
+		marginTop: 2,
+	},
+	desc: {
+		color: colors.subtext,
+		marginTop: spacing.xs,
+	},
 });
