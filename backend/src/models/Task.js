@@ -28,6 +28,14 @@ const taskSchema = new mongoose.Schema(
 			ref: "User",
 			default: null,
 		},
+		completedBy: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "User",
+			default: null,
+		},
+		completedAt: {
+			type: Date,
+		},
 	},
 	{ timestamps: true }
 );

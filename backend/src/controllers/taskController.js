@@ -33,3 +33,29 @@ export const getTask = asyncHandler(async (req, res) => {
 
 	res.json({ task });
 });
+
+export const completeTask = asyncHandler(async (req, res) => {
+	const { id } = req.params; // task id
+	const userId = req.user.id;
+
+	const task = await Task.findById(id);
+	if (!task) throw new AppError("Task not found", 404);
+
+	// must be owner or assigned worker
+	const isOwner = task.postedBy.toString() === userId;
+	const isWorker = task.assignedTo?.toString() === userId;
+
+	if (!isOwner && !isWorker)
+		throw new AppError("Not authorized to complete this task", 403);
+
+	if (task.status === "completed")
+		throw new AppError("Task already completed", 400);
+
+	// mark complete
+	task.status = "completed";
+	task.completedBy = userId;
+	task.completedAt = new Date();
+	await task.save();
+
+	res.json({ message: "Task marked as completed", task });
+});
