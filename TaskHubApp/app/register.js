@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
 import { View, Text, TextInput, Button, StyleSheet } from "react-native";
 import { AuthContext } from "../context/AuthContext";
+import { router } from "expo-router";
 
 export default function RegisterScreen({ navigation }) {
 	const { register } = useContext(AuthContext);
@@ -13,7 +14,7 @@ export default function RegisterScreen({ navigation }) {
 	const handleRegister = async () => {
 		try {
 			await register(name, email, password, phone);
-			navigation.navigate("Home"); // Redirect after success
+			router.replace("/"); // Redirect after success
 		} catch (err) {
 			setError(err.response?.data?.message || "Registration failed");
 		}
@@ -58,7 +59,7 @@ export default function RegisterScreen({ navigation }) {
 			<Button title='Register' onPress={handleRegister} />
 			<Button
 				title='Already have an account? Login'
-				onPress={() => navigation.navigate("Login")}
+				onPress={() => router.push("/login")}
 			/>
 		</View>
 	);

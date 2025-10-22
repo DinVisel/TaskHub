@@ -1,17 +1,18 @@
 import React, { useState, useContext } from "react";
-import { View, TextInput, Button, Text, StyleSheet } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet } from "react-native";
 import { AuthContext } from "../context/AuthContext";
+import { router } from "expo-router";
 
-export default function LoginScreen({ navigation }) {
-	const { login } = useContext(AuthContext); // 🧠 use global login()
+export default function Login() {
+	const { login } = useContext(AuthContext);
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState("");
 
 	const handleLogin = async () => {
 		try {
-			await login(email, password); // AuthContext handles API + token storage
-			navigation.navigate("Home"); // redirect on success
+			await login(email, password);
+			router.replace("/"); // go to home
 		} catch (err) {
 			setError(err.response?.data?.message || "Login failed");
 		}
@@ -19,31 +20,23 @@ export default function LoginScreen({ navigation }) {
 
 	return (
 		<View style={styles.container}>
-			<Text style={styles.title}>Welcome Back</Text>
-
+			<Text style={styles.title}>Login</Text>
 			<TextInput
 				style={styles.input}
 				placeholder='Email'
 				value={email}
 				onChangeText={setEmail}
-				autoCapitalize='none'
 			/>
-
 			<TextInput
 				style={styles.input}
 				placeholder='Password'
-				secureTextEntry
 				value={password}
+				secureTextEntry
 				onChangeText={setPassword}
 			/>
-
 			{error ? <Text style={styles.error}>{error}</Text> : null}
-
 			<Button title='Login' onPress={handleLogin} />
-			<Button
-				title='Create new account'
-				onPress={() => navigation.navigate("Register")}
-			/>
+			<Button title='Create Account' onPress={() => router.push("/register")} />
 		</View>
 	);
 }
@@ -61,7 +54,7 @@ const styles = StyleSheet.create({
 		borderColor: "#ccc",
 		borderRadius: 6,
 		padding: 10,
-		marginBottom: 12,
+		marginBottom: 10,
 	},
-	error: { color: "red", marginBottom: 10, textAlign: "center" },
+	error: { color: "red", textAlign: "center", marginBottom: 10 },
 });
