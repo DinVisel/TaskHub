@@ -1,23 +1,47 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet } from "react-native";
 import api from "../../api/api";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as Location from "expo-location";
 
 export default function PostTask() {
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
 	const [message, setMessage] = useState("");
+	const [city, setCity] = useState("");
+	const [coords, setCoords] = useState(null);
+	const [category, setCategory] = useState("");
 
 	const handlePost = async () => {
 		try {
-			const res = await api.post("/tasks", { title, description });
+			const res = await api.post("/tasks", {
+				title,
+				description,
+				category,
+				city,
+				location: coords,
+			});
 			setMessage("Task posted successfully!");
 			setTitle("");
 			setDescription("");
+			setCategory("");
+			setCity("");
 		} catch (err) {
 			setMessage(err.response?.data?.message || "Failed to post task");
 		}
 	};
+
+	useEffect(() => {
+		(async () => {
+			const { status } = await Location.requestForegroundPermissionsAsync();
+			if (status !== "granted") return;
+			const location = await Location.getCurrentPositionAsync({});
+			setCoords({
+				lat: location.coords.latitude,
+				lng: location.coords.longitude,
+			});
+		})();
+	}, []);
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -27,6 +51,12 @@ export default function PostTask() {
 				placeholder='Title'
 				value={title}
 				onChangeText={setTitle}
+			/>
+			<TextInput
+				style={styles.input}
+				placeholder='Category'
+				value={category}
+				onChangeText={setCategory}
 			/>
 			<TextInput
 				style={styles.input}
