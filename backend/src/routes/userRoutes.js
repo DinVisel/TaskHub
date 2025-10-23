@@ -1,11 +1,15 @@
-import {Router}from "express"
-import {protect}from "../middleware/authMiddleware.js"
-import { getMyJobs,getMyOffers,getMyTasks } from "../controllers/userController.js"
+import { Router } from "express";
+import { protect, restrictTo } from "../middleware/authMiddleware.js";
+import {
+        getMyJobs,
+        getMyOffers,
+        getMyTasks,
+} from "../controllers/userController.js";
 
-const router = Router()
+const router = Router();
 
-router.get("my-tasks",protect,getMyTasks)
-router.get("my-offers",protect,getMyOffers)
-router.get("my-jobs",protect,getMyJobs)
+router.get("/my-tasks", protect, restrictTo("client"), getMyTasks);
+router.get("/my-offers", protect, restrictTo("worker"), getMyOffers);
+router.get("/my-jobs", protect, restrictTo("worker"), getMyJobs);
 
-export default router
+export default router;

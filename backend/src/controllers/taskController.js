@@ -3,6 +3,9 @@ import AppError from "../utils/appError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const createTask = asyncHandler(async (req, res) => {
+        if (req.user.role !== "client")
+                throw new AppError("Only clients can create tasks", 403);
+
         const { title, description, category, price, location } = req.body;
         if (!title || !description)
                 throw new AppError("Title and description are required", 400);

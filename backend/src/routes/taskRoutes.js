@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { protect } from "../middleware/authMiddleware.js";
+import { protect, restrictTo } from "../middleware/authMiddleware.js";
 import {
         createTask,
         getTask,
@@ -9,7 +9,7 @@ import {
 
 const router = Router();
 
-router.route("/").post(protect, createTask).get(getFilteredTasks);
+router.route("/").post(protect, restrictTo("client"), createTask).get(getFilteredTasks);
 router.put("/:id/complete", protect, completeTask);
 
 router.route("/:id").get(getTask);
