@@ -6,6 +6,10 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 export const createOffer = asyncHandler(async (req, res) => {
 	const { taskId, message, amount } = req.body;
 
+	if (req.user.role !== "worker") {
+		throw new AppError("Only workers can apply to tasks", 403);
+	}
+
 	if (!taskId) throw new AppError("Task ID is required", 400);
 
 	const task = await Task.findById(taskId);

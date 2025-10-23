@@ -1,6 +1,6 @@
 import { supabase } from "../utils/supabaseClient.js";
 import asyncHandler from "../utils/asyncHandler.js";
-import AppError from "../utils/AppError.js";
+import AppError from "../utils/appError.js";
 import multer from "multer";
 import fs from "fs";
 

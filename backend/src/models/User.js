@@ -10,6 +10,11 @@ const userSchema = new mongoose.Schema(
 			lowercase: true,
 			trim: true,
 		},
+		role: {
+			type: String,
+			enum: ["client", "worker"],
+			default: "worker",
+		},
 		phone: { type: String, trim: true },
 		passwordHash: { type: String, required: true, select: false },
 		bio: { type: String, default: "" },

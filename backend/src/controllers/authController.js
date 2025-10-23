@@ -5,7 +5,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { signToken } from "../utils/jwt.js";
 
 export const register = asyncHandler(async (req, res) => {
-	const { name, email, password, phone } = req.body;
+	const { name, email, password, phone, role } = req.body;
 
 	if (!name || !email || !password)
 		throw new AppError("name, email, password are required", 400);
@@ -16,7 +16,13 @@ export const register = asyncHandler(async (req, res) => {
 	const salt = await bcrypt.genSalt(10);
 	const passwordHash = await bcrypt.hash(password, salt);
 
-	const user = await User.create({ name, email, phone, passwordHash });
+	const user = await User.create({
+		name,
+		email,
+		phone,
+		passwordHash,
+		role: role || "worker",
+	});
 	const token = signToken({ id: user._id });
 
 	res.status(201).json({ token, user: user.toSafeObject() });
