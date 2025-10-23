@@ -1,18 +1,16 @@
 import { Router } from "express";
 import { protect } from "../middleware/authMiddleware.js";
 import {
-	createTask,
-	getTasks,
-	getTask,
-	completeTask,
-	getFilteredTasks,
+        createTask,
+        getTask,
+        completeTask,
+        getFilteredTasks,
 } from "../controllers/taskController.js";
 
 const router = Router();
 
-router.route("/").post(protect, createTask).get(getTasks);
+router.route("/").post(protect, createTask).get(getFilteredTasks);
 router.put("/:id/complete", protect, completeTask);
-router.get("/", getFilteredTasks);
 
 router.route("/:id").get(getTask);
 

@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Message from "../models/Message.js";
 import Task from "../models/Task.js";
 import Offer from "../models/Offer.js";
@@ -28,10 +29,10 @@ export const getTaskMessages = asyncHandler(async (req, res) => {
 	const { ok, reason } = await canChat(req.user.id, taskId);
 	if (!ok) throw new AppError(reason, 403);
 
-	const messages = await Message.find({ taskId })
-		.sort({ createdAt: 1 })
-		.populate("senderId", "name")
-		.populate("receiverId", "name");
+        const messages = await Message.find({ taskId })
+                .sort({ createdAt: 1 })
+                .populate("senderId", "name")
+                .populate("receiverId", "name");
 
 	res.json({ messages });
 });
@@ -57,29 +58,44 @@ export const sendMessageREST = asyncHandler(async (req, res) => {
 });
 
 export const getUserThreads = asyncHandler(async (req, res) => {
-	const userId = req.user.id;
+        const userId = req.user.id;
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+                throw new AppError("Invalid user id", 400);
+        }
+        const userObjectId = new mongoose.Types.ObjectId(userId);
 
-	const threads = await Message.aggregate([
-		{ $match: { $or: [{ senderId: userId }, { receiverId: userId }] } },
-		{ $sort: { createdAt: -1 } },
-		{
-			$group: {
-				_id: "$taskId",
-				lastMessage: { $first: "$content" },
-			},
-		},
-	]);
+        const threads = await Message.aggregate([
+                {
+                        $match: {
+                                $or: [
+                                        { senderId: userObjectId },
+                                        { receiverId: userObjectId },
+                                ],
+                        },
+                },
+                { $sort: { createdAt: -1 } },
+                {
+                        $group: {
+                                _id: "$taskId",
+                                lastMessage: { $first: "$content" },
+                                lastSenderId: { $first: "$senderId" },
+                                lastCreatedAt: { $first: "$createdAt" },
+                        },
+                },
+        ]);
 
-	const populated = await Promise.all(
-		threads.map(async (t) => {
-			const task = await Task.findById(t._id);
-			return {
-				taskId: t._id,
-				taskTitle: task?.title || "Unknown Task",
-				lastMessage: t.lastMessage,
-			};
-		})
-	);
+        const populated = await Promise.all(
+                threads.map(async (t) => {
+                        const task = await Task.findById(t._id);
+                        return {
+                                taskId: t._id,
+                                taskTitle: task?.title || "Unknown Task",
+                                lastMessage: t.lastMessage,
+                                lastSenderId: t.lastSenderId,
+                                lastMessageAt: t.lastCreatedAt,
+                        };
+                })
+        );
 
 	res.json({ threads: populated });
 });

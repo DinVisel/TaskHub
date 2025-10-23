@@ -3,25 +3,20 @@ import AppError from "../utils/appError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const createTask = asyncHandler(async (req, res) => {
-	const { title, description, category, price, location } = req.body;
-	if (!title || !description)
-		throw new AppError("Title and description are required", 400);
+        const { title, description, category, price, location } = req.body;
+        if (!title || !description)
+                throw new AppError("Title and description are required", 400);
 
-	const task = Task.create({
-		title,
-		description,
-		category,
-		price,
-		location,
-		postedBy: req.user.id,
-	});
+        const task = await Task.create({
+                title,
+                description,
+                category,
+                price,
+                location,
+                postedBy: req.user.id,
+        });
 
-	res.status(201).json({ task });
-});
-
-export const getTasks = asyncHandler(async (req, res) => {
-	const tasks = await Task.find({ status: "open" }).populate("postedBy", "name");
-	res.json({ tasks });
+        res.status(201).json({ task });
 });
 
 export const getTask = asyncHandler(async (req, res) => {
@@ -61,20 +56,27 @@ export const completeTask = asyncHandler(async (req, res) => {
 });
 
 export const getFilteredTasks = asyncHandler(async (req, res) => {
-	const { search, category, city } = req.query;
-	const query = { status: "open" };
+        const { search, category, city } = req.query;
+        const query = { status: "open" };
 
-	if (search) {
-		query.$or = [
-			{ title: { $regex: search, $options: "i" } },
-			{ description: { $regex: search, $options: "i" } },
-		];
-	}
-	if (category && category !== "All") {
-		query.category = category;
-	}
-	if (city) query.city = { $regex: city, $options: "i" };
+        if (search) {
+                query.$or = [
+                        { title: { $regex: search, $options: "i" } },
+                        { description: { $regex: search, $options: "i" } },
+                ];
+        }
 
-	const tasks = await Task.find(query).sort({ createdAt: -1 });
-	res.status(200).json({ success: true, tasks });
+        if (category && category !== "All") {
+                query.category = category;
+        }
+
+        if (city) {
+                query["location.address"] = { $regex: city, $options: "i" };
+        }
+
+        const tasks = await Task.find(query)
+                .sort({ createdAt: -1 })
+                .populate("postedBy", "name");
+
+        res.status(200).json({ tasks });
 });

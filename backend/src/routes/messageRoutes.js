@@ -8,8 +8,8 @@ import {
 
 const router = Router();
 
+router.get("/overview", protect, getUserThreads);
 router.get("/:taskId", protect, getTaskMessages);
 router.post("/", protect, sendMessageREST);
-router.get("/overview", protect, getUserThreads);
 
 export default router;

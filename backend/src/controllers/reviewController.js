@@ -22,23 +22,23 @@ export const createReview = asyncHandler(async (req, res) => {
 		throw new AppError("You are not allowed to review this task", 403);
 	}
 
-	const review = await Review.create({
-		taskId,
-		reviewerId: req.user.id,
-		reviewedUserId,
-		rating,
-		comment,
-	});
+        const review = await Review.create({
+                taskId,
+                reviewerId: req.user.id,
+                reviewedUserId,
+                rating,
+                comment,
+        });
 
-	const stats = await Review.aggregate([
-		{ $match: { reviewedUserId: review.reviewedUserId } },
-		{ $group: { _id: "$reviewedUserId", avgRating: { $avg: rating } } },
-	]);
-	if (stats.length > 0) {
-		await User.findByIdAndUpdate(review.reviewedUserId, {
-			rating: stats[0].avgRating.toFixed(1),
-		});
-	}
+        const stats = await Review.aggregate([
+                { $match: { reviewedUserId: review.reviewedUserId } },
+                { $group: { _id: "$reviewedUserId", avgRating: { $avg: "$rating" } } },
+        ]);
+        if (stats.length > 0) {
+                await User.findByIdAndUpdate(review.reviewedUserId, {
+                        rating: Number(stats[0].avgRating.toFixed(1)),
+                });
+        }
 
 	res.status(201).json({ review });
 });
