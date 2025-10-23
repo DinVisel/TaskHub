@@ -4,8 +4,13 @@ const taskSchema = new mongoose.Schema(
 	{
 		title: { type: String, required: true, trim: true },
 		description: { type: String, required: true },
-		category: { type: String, trim: true },
+		category: {
+			type: String,
+			enum: ["Cleaning", "Repair", "Programming", "Tutoring", "Delivery", "Other"],
+			default: "Other",
+		},
 		price: { type: Number, default: 0 },
+		budget: Number,
 		status: {
 			type: String,
 			enum: ["open", "in_progress", "completed", "cancelled"],

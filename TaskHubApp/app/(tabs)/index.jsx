@@ -13,22 +13,35 @@ import { router } from "expo-router";
 import api from "../../api/api";
 import { colors, spacing, fonts } from "../../theme.js";
 
+const categories = [
+	"All",
+	"Cleaning",
+	"Repair",
+	"Programming",
+	"Tutoring",
+	"Delivery",
+];
+
 export default function Home() {
 	const [tasks, setTasks] = useState([]);
+	const [search, setSearch] = useState("");
+	const [selectedCategory, setSelectedCategory] = useState("All");
 
 	const scrollY = useRef(new Animated.Value(0)).current;
 
 	useEffect(() => {
 		const fetchTasks = async () => {
 			try {
-				const res = await api.get("/tasks");
+				const res = await api.get("/tasks", {
+					params: { search, category: selectedCategory },
+				});
 				setTasks(res.data.tasks);
 			} catch (err) {
 				console.log("Error fetching tasks:", err.message);
 			}
 		};
 		fetchTasks();
-	}, []);
+	}, [selectedCategory]);
 
 	const headerHeight = scrollY.interpolate({
 		inputRange: [0, 80],
@@ -61,6 +74,29 @@ export default function Home() {
 				<Text style={styles.subHeader}>Find local help or offer your skills</Text>
 			</Animated.View>
 
+			{/* Categories */}
+			<Animated.View style={styles.categories}>
+				{categories.map((cat) => (
+					<TouchableOpacity
+						key={cat}
+						style={[
+							styles.category,
+							selectedCategory === cat && styles.categoryActive,
+						]}
+						onPress={() => setSelectedCategory(cat)}
+					>
+						<Text
+							style={{
+								color: selectedCategory === cat ? "#fff" : colors.text,
+								fontWeight: "600",
+							}}
+						>
+							{cat}
+						</Text>
+					</TouchableOpacity>
+				))}
+			</Animated.View>
+
 			{/* Scrollable Content */}
 			<Animated.FlatList
 				style={{ flex: 1 }}
@@ -85,6 +121,7 @@ export default function Home() {
 						<Text style={styles.desc} numberOfLines={2}>
 							{item.description}
 						</Text>
+						<Text style={styles.city}>{item.city || "Unknown"}</Text>
 					</TouchableOpacity>
 				)}
 			/>
@@ -146,4 +183,23 @@ const styles = StyleSheet.create({
 		color: colors.subtext,
 		marginTop: spacing.xs,
 	},
+	categories: {
+		flexDirection: "row",
+		flexWrap: "wrap",
+		justifyContent: "center",
+		marginVertical: 10,
+	},
+	category: {
+		borderRadius: 20,
+		borderWidth: 1,
+		borderColor: colors.primary,
+		paddingHorizontal: 14,
+		paddingVertical: 6,
+		margin: 4,
+	},
+	categoryActive: {
+		backgroundColor: colors.primary,
+	},
+	categoryTag: { color: colors.primary, marginBottom: 4 },
+	city: { color: "#666", fontSize: 12 },
 });

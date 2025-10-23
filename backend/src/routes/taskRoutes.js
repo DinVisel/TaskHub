@@ -5,12 +5,14 @@ import {
 	getTasks,
 	getTask,
 	completeTask,
+	getFilteredTasks,
 } from "../controllers/taskController.js";
 
 const router = Router();
 
 router.route("/").post(protect, createTask).get(getTasks);
 router.put("/:id/complete", protect, completeTask);
+router.get("/", getFilteredTasks);
 
 router.route("/:id").get(getTask);
 

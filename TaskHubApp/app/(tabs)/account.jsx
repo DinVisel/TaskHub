@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
 	View,
 	Text,
@@ -12,9 +12,26 @@ import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors, spacing } from "@/theme";
+import api from "@/api/api";
 
 export default function Account() {
 	const { user, logout } = useContext(AuthContext);
+	const [reviews, setReviews] = useState([]);
+	const [average, setAverage] = useState(0);
+
+	useEffect(() => {
+		const fetchReviews = async () => {
+			const res = await api.get(`/reviews/user/${user._id}`);
+			setReviews(res.data.reviews);
+			if (res.data.reviews.lenght > 0) {
+				const avg =
+					res.data.reviews.reduce((sum, r) => sum + r.rating, 0) /
+					res.data.reviews.lenght;
+				setAverage(avg.toFixed(1));
+			}
+		};
+		fetchReviews();
+	}, []);
 
 	return (
 		<View style={styles.container}>
@@ -29,6 +46,10 @@ export default function Account() {
 				<Text style={styles.name}>{user?.name}</Text>
 				<Text style={styles.email}>{user?.email}</Text>
 			</LinearGradient>
+
+			<Text style={styles.text}>
+				⭐ {average}/5 ({reviews.length} reviews)
+			</Text>
 
 			<TouchableOpacity
 				style={styles.button}

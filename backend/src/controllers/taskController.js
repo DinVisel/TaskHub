@@ -59,3 +59,22 @@ export const completeTask = asyncHandler(async (req, res) => {
 
 	res.json({ message: "Task marked as completed", task });
 });
+
+export const getFilteredTasks = asyncHandler(async (req, res) => {
+	const { search, category, city } = req.query;
+	const query = { status: "open" };
+
+	if (search) {
+		query.$or = [
+			{ title: { $regex: search, $options: "i" } },
+			{ description: { $regex: search, $options: "i" } },
+		];
+	}
+	if (category && category !== "All") {
+		query.category = category;
+	}
+	if (city) query.city = { $regex: city, $options: "i" };
+
+	const tasks = await Task.find(query).sort({ createdAt: -1 });
+	res.status(200).json({ success: true, tasks });
+});
