@@ -6,6 +6,7 @@ import {
 	StyleSheet,
 	StatusBar,
 	TouchableOpacity,
+	TextInput,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -29,19 +30,24 @@ export default function Home() {
 
 	const scrollY = useRef(new Animated.Value(0)).current;
 
+	const fetchTasks = async () => {
+		try {
+			const res = await api.get("/tasks", {
+				params: { search, category: selectedCategory },
+			});
+			setTasks(res.data.tasks);
+		} catch (err) {
+			console.log("Error fetching tasks:", err.message);
+		}
+	};
+
 	useEffect(() => {
-		const fetchTasks = async () => {
-			try {
-				const res = await api.get("/tasks", {
-					params: { search, category: selectedCategory },
-				});
-				setTasks(res.data.tasks);
-			} catch (err) {
-				console.log("Error fetching tasks:", err.message);
-			}
-		};
 		fetchTasks();
 	}, [selectedCategory]);
+
+	const handleSearch = () => {
+		fetchTasks();
+	};
 
 	const headerHeight = scrollY.interpolate({
 		inputRange: [0, 80],
@@ -61,8 +67,14 @@ export default function Home() {
 				colors={[colors.secondary, colors.primary]}
 				style={styles.header}
 			>
-				<Text style={styles.headerTitle}>Find Help Nearby</Text>
-				<Text style={styles.headerSubtitle}>Exchange skills in your community</Text>
+				<Text style={styles.headerTitle}>Find a Job</Text>
+				<TextInput
+					placeholder='Search tasks...'
+					value={search}
+					onChangeText={setSearch}
+					onSubmitEditing={handleSearch}
+					style={styles.searchBar}
+				/>
 			</LinearGradient>
 
 			<StatusBar barStyle='dark-content' />

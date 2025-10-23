@@ -29,6 +29,12 @@ export default function PostTask() {
 				onChangeText={setTitle}
 			/>
 			<TextInput
+				style={styles.input}
+				placeholder='City'
+				value={city}
+				onChangeText={setCity}
+			/>
+			<TextInput
 				style={[styles.input, { height: 100 }]}
 				placeholder='Description'
 				value={description}
