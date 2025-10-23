@@ -20,18 +20,28 @@ export default function Account() {
 	const [average, setAverage] = useState(0);
 
 	useEffect(() => {
+		if (!user?._id) return;
+
 		const fetchReviews = async () => {
-			const res = await api.get(`/reviews/user/${user._id}`);
-			setReviews(res.data.reviews);
-			if (res.data.reviews.lenght > 0) {
-				const avg =
-					res.data.reviews.reduce((sum, r) => sum + r.rating, 0) /
-					res.data.reviews.lenght;
-				setAverage(avg.toFixed(1));
+			try {
+				const res = await api.get(`/reviews/user/${user._id}`);
+				const fetchedReviews = res.data.reviews || [];
+				setReviews(fetchedReviews);
+
+				if (fetchedReviews.length > 0) {
+					const total = fetchedReviews.reduce((sum, r) => sum + (r.rating || 0), 0);
+					const avg = total / fetchedReviews.length;
+					setAverage(avg.toFixed(1));
+				} else {
+					setAverage("0.0");
+				}
+			} catch (err) {
+				console.log("Failed to load reviews:", err.message);
 			}
 		};
+
 		fetchReviews();
-	}, []);
+	}, [user?._id]);
 
 	return (
 		<View style={styles.container}>
@@ -53,7 +63,7 @@ export default function Account() {
 
 			<TouchableOpacity
 				style={styles.button}
-				onPress={() => router.push("/(tabs)/messages")}
+				onPress={() => router.push("/chat/messages")}
 			>
 				<Text style={styles.buttonText}>💬 Messages</Text>
 			</TouchableOpacity>

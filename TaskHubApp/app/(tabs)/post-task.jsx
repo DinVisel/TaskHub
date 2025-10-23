@@ -8,24 +8,39 @@ export default function PostTask() {
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
 	const [message, setMessage] = useState("");
-	const [city, setCity] = useState("");
-	const [coords, setCoords] = useState(null);
+        const [city, setCity] = useState("");
+        const [coords, setCoords] = useState(null);
 	const [category, setCategory] = useState("");
 
 	const handlePost = async () => {
-		try {
-			const res = await api.post("/tasks", {
-				title,
-				description,
-				category,
-				city,
-				location: coords,
-			});
-			setMessage("Task posted successfully!");
-			setTitle("");
-			setDescription("");
-			setCategory("");
-			setCity("");
+                try {
+                        const payload = {
+                                title,
+                                description,
+                                category,
+                        };
+
+                        const trimmedCity = city.trim();
+                        const locationData = {};
+
+                        if (trimmedCity) {
+                                locationData.address = trimmedCity;
+                        }
+
+                        if (coords?.lat != null && coords?.lng != null) {
+                                locationData.coordinates = { ...coords };
+                        }
+
+                        if (Object.keys(locationData).length > 0) {
+                                payload.location = locationData;
+                        }
+
+                        const res = await api.post("/tasks", payload);
+                        setMessage("Task posted successfully!");
+                        setTitle("");
+                        setDescription("");
+                        setCategory("");
+                        setCity("");
 		} catch (err) {
 			setMessage(err.response?.data?.message || "Failed to post task");
 		}

@@ -37,25 +37,24 @@ export default function MapScreen() {
 
 	return (
 		<MapView style={styles.map} initialRegion={region} showsUserLocation>
-			{tasks.map(
-				(t) =>
-					t.latitude &&
-					t.longitude && (
-						<Marker
-							key={t._id}
-							coordinate={{ latitude: t.latitude, longitude: t.longitude }}
-							title={t.title}
-						>
-							<Callout onPress={() => router.push(`/chat/${t._id}`)}>
-								<View style={{ width: 200 }}>
-									<Text style={{ fontWeight: "bold" }}>{t.title}</Text>
-									<Text>{t.city}</Text>
-									<Text>{t.description.slice(0, 40)}...</Text>
-								</View>
-							</Callout>
-						</Marker>
-					)
-			)}
+			{tasks.map((t) => {
+				const latitude = t?.location?.coordinates?.lat;
+				const longitude = t?.location?.coordinates?.lng;
+
+				if (latitude == null || longitude == null) return null;
+
+				return (
+					<Marker key={t._id} coordinate={{ latitude, longitude }} title={t.title}>
+						<Callout onPress={() => router.push(`/chat/${t._id}`)}>
+							<View style={{ width: 200 }}>
+								<Text style={{ fontWeight: "bold" }}>{t.title}</Text>
+								<Text>{t?.location?.address || t?.location?.city || "Unknown"}</Text>
+								<Text>{t.description.slice(0, 40)}...</Text>
+							</View>
+						</Callout>
+					</Marker>
+				);
+			})}
 		</MapView>
 	);
 }
