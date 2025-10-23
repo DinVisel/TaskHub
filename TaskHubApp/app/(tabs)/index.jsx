@@ -6,8 +6,8 @@ import {
 	StyleSheet,
 	StatusBar,
 	TouchableOpacity,
-        TextInput,
-        Image,
+	TextInput,
+	Image,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -116,41 +116,46 @@ export default function Home() {
 				data={tasks}
 				keyExtractor={(item) => item._id}
 				contentContainerStyle={{ padding: spacing.md }}
-                                renderItem={({ item }) => {
-                                        const cityName =
-                                                item?.location?.address?.trim() ||
-                                                item?.location?.city?.trim() ||
-                                                "Unknown";
+				renderItem={({ item }) => {
+					const cityName =
+						item?.location?.address?.trim() ||
+						item?.location?.city?.trim() ||
+						"Unknown";
 
-                                        return (
-                                                <TouchableOpacity
-                                                        onPress={() => router.push(`/chat/${item._id}`)}
-                                                        style={styles.card}
-                                                >
-                                                        <View style={styles.row}>
-                                                                <Image
-                                                                        source={{
-                                                                                uri:
-                                                                                        item.ownerAvatar ||
-                                                                                        "https://i.pravatar.cc/80",
-                                                                        }}
-                                                                        style={styles.avatar}
-                                                                />
-                                                                <View style={{ flex: 1 }}>
-                                                                        <Text style={styles.title}>{item.title}</Text>
-                                                                        <Text style={styles.subtitle}>
-                                                                                {item.category || "General"}
-                                                                        </Text>
-                                                                </View>
-                                                        </View>
-                                                        <Text style={styles.desc} numberOfLines={2}>
-                                                                {item.description}
-                                                        </Text>
-                                                        <Text style={styles.city}>{cityName}</Text>
-                                                </TouchableOpacity>
-                                        );
-                                }}
-                        />
+					return (
+						<TouchableOpacity
+							onPress={() => router.push(`/chat/${item._id}`)}
+							style={styles.card}
+						>
+							<View style={styles.row}>
+								<Image
+									source={{
+										uri: item.ownerAvatar || "https://i.pravatar.cc/80",
+									}}
+									style={styles.avatar}
+								/>
+								<View style={{ flex: 1 }}>
+									<Text style={styles.title}>{item.title}</Text>
+									<Text style={styles.subtitle}>{item.category || "General"}</Text>
+									<Image
+										source={{ uri: item.image }}
+										style={{
+											width: "100%",
+											height: 180,
+											borderRadius: 12,
+											marginBottom: 8,
+										}}
+									/>
+								</View>
+							</View>
+							<Text style={styles.desc} numberOfLines={2}>
+								{item.description}
+							</Text>
+							<Text style={styles.city}>{cityName}</Text>
+						</TouchableOpacity>
+					);
+				}}
+			/>
 		</SafeAreaView>
 	);
 }
