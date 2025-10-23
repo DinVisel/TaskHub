@@ -3,7 +3,7 @@ import MapView, { Marker, Callout } from "react-native-maps";
 import * as Location from "expo-location";
 import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
 import { router } from "expo-router";
-import api from "../../api/api";
+import api from "../api/api.js";
 
 export default function MapScreen() {
 	const [tasks, setTasks] = useState([]);
