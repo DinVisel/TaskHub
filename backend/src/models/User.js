@@ -27,6 +27,16 @@ const userSchema = new mongoose.Schema(
 		},
 		rating: { type: Number, default: 0 },
 		completedTasks: { type: Number, default: 0 },
+		preferences: {
+			categories: {
+				type: [String],
+				default: [],
+			},
+			radiusKm: {
+				type: Number,
+				default: 25,
+			},
+		},
 	},
 	{ timestamps: true }
 );

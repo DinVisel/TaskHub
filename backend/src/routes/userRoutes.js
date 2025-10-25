@@ -5,6 +5,7 @@ import {
 	getMyOffers,
 	getMyTasks,
 	getUserStats,
+	updatePreferences,
 } from "../controllers/userController.js";
 
 const router = Router();
@@ -13,5 +14,6 @@ router.get("/my-tasks", protect, restrictTo("client"), getMyTasks);
 router.get("/my-offers", protect, restrictTo("worker"), getMyOffers);
 router.get("/my-jobs", protect, restrictTo("worker"), getMyJobs);
 router.get("/stats", protect, getUserStats);
+router.patch("/preferences", protect, updatePreferences);
 
 export default router;

@@ -13,6 +13,7 @@ import offerRoutes from "./routes/offerRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import matchRoutes from "./routes/matchRoutes.js";
 
 import { verifyToken } from "./utils/jwt.js";
 import Task from "./models/Task.js";

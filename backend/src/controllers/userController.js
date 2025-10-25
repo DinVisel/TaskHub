@@ -76,3 +76,12 @@ export const getUserStats = asyncHandler(async (req, res) => {
 		totalEarnings,
 	});
 });
+
+export const updatePreferences = asyncHandler(async (req, res) => {
+	const { categories, radiusKm } = req.body;
+	req.user.preferences.categories =
+		categories || req.user.preferences.categories;
+	req.user.preferences.radiusKm = radiusKm || req.user.preferences.radiusKm;
+	await req.user.save();
+	res.json(req.user.preferences);
+});
