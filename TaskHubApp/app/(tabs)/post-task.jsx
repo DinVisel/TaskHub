@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet, Image } from "react-native";
 import api from "../../api/api";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Location from "expo-location";
