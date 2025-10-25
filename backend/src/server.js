@@ -12,6 +12,7 @@ import taskRoutes from "./routes/taskRoutes.js";
 import offerRoutes from "./routes/offerRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 import { verifyToken } from "./utils/jwt.js";
 import Task from "./models/Task.js";
@@ -29,6 +30,7 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/offers", offerRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.use(notFound);
 app.use(globalErrorHandler);
