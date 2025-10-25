@@ -14,6 +14,7 @@ import messageRoutes from "./routes/messageRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import matchRoutes from "./routes/matchRoutes.js";
+import walletRoutes from "./routes/walletRoutes.js";
 
 import { verifyToken } from "./utils/jwt.js";
 import Task from "./models/Task.js";
@@ -32,6 +33,8 @@ app.use("/api/offers", offerRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/wallet", walletRoutes);
+app.use("/api/match", matchRoutes);
 
 app.use(notFound);
 app.use(globalErrorHandler);
