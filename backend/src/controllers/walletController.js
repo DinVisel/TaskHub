@@ -1,5 +1,5 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
-import User from "../models/userModel.js";
+import User from "../models/User.js";
 import AppError from "../utils/appError.js";
 
 // GET /api/wallet
