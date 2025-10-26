@@ -12,7 +12,11 @@ export const protect = async (req, res, next) => {
 		if (!user)
 			return next(new AppError("Not authorized, user no longer exists", 401));
 
-		req.user = { id: user._id.toString(), role: user.role };
+		req.user = {
+			id: user._id.toString(),
+			_id: user._id,
+			role: user.role,
+		};
 		next();
 	} catch (error) {
 		next(new AppError("Not authorized, token invalid", 401));

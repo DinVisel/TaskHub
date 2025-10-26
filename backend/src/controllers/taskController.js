@@ -1,4 +1,5 @@
 import Task from "../models/Task.js";
+import User from "../models/User.js";
 import AppError from "../utils/appError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
@@ -6,15 +7,26 @@ export const createTask = asyncHandler(async (req, res) => {
 	if (req.user.role !== "client")
 		throw new AppError("Only clients can create tasks", 403);
 
-	const { title, description, category, price, location } = req.body;
+	const { title, description, category, price, location, budget } = req.body;
 	if (!title || !description)
 		throw new AppError("Title and description are required", 400);
+
+	const numericPrice = price !== undefined ? Number(price) : undefined;
+	const numericBudget = budget !== undefined ? Number(budget) : undefined;
+
+	if (
+		(numericPrice !== undefined && !Number.isFinite(numericPrice)) ||
+		(numericBudget !== undefined && !Number.isFinite(numericBudget))
+	) {
+		throw new AppError("Price and budget must be valid numbers", 400);
+	}
 
 	const task = await Task.create({
 		title,
 		description,
 		category,
-		price,
+		price: numericPrice ?? numericBudget ?? 0,
+		budget: numericBudget ?? numericPrice ?? 0,
 		location,
 		postedBy: req.user.id,
 	});
@@ -43,8 +55,19 @@ export const completeTask = asyncHandler(async (req, res) => {
 		const client = await User.findById(task.postedBy);
 		const worker = await User.findById(task.assignedTo);
 
-		const payout = task.budget * (1 - task.commissionRate);
-		const commission = task.budget * task.commissionRate;
+		if (!client || !worker)
+			throw new AppError("Task participants not found", 400);
+
+		const effectiveBudget =
+			typeof task.budget === "number" && Number.isFinite(task.budget)
+				? task.budget
+				: task.price;
+
+		if (!Number.isFinite(effectiveBudget) || effectiveBudget <= 0)
+			throw new AppError("Task budget not set", 400);
+
+		const payout = effectiveBudget * (1 - task.commissionRate);
+		const commission = effectiveBudget * task.commissionRate;
 
 		worker.walletBalance += payout;
 		worker.transactions.push({
@@ -54,11 +77,13 @@ export const completeTask = asyncHandler(async (req, res) => {
 		});
 
 		// record platform commission (for admin analytics)
-		client.transactions.push({
-			type: "commission",
-			amount: -commission,
-			description: `Commission charged for task: ${task.title}`,
-		});
+		if (commission > 0) {
+			client.transactions.push({
+				type: "commission",
+				amount: -commission,
+				description: `Commission charged for task: ${task.title}`,
+			});
+		}
 
 		await worker.save();
 		await client.save();
