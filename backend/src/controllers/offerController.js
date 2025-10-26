@@ -1,5 +1,6 @@
 import Offer from "../models/Offer.js";
 import Task from "../models/Task.js";
+import User from "../models/User.js";
 import AppError from "../utils/appError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
@@ -58,9 +59,26 @@ export const acceptOffer = asyncHandler(async (req, res) => {
 	const task = await Task.findById(offer.taskId);
 	if (!task) throw new AppError("Task not found", 404);
 
+	const client = await User.findById(task.postedBy);
+
+	if (client.walletBalance < task.budget) {
+		throw new AppError("Insufficent funds in wallet", 400);
+	}
+
 	if (task.postedBy.toString() !== req.user.id) {
 		throw new AppError("Not authorized to accept offer for this task", 403);
 	}
+
+	client.walletBalance -= task.budget;
+	client.transactions.push({
+		type: "spend",
+		amount: -task.budget,
+		description: `Payment for task: ${task.title}`,
+	});
+
+	task.paid = true;
+	await client.save();
+	await task.save();
 
 	offer.status = "accepted";
 	await offer.save();
