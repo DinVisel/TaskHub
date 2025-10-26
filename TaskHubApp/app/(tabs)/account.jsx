@@ -70,7 +70,10 @@ export default function Account() {
 
 			<TouchableOpacity
 				style={[styles.button, { backgroundColor: "#FF3B30" }]}
-				onPress={logout}
+				onPress={() => {
+					router.replace("/login");
+					logout;
+				}}
 			>
 				<Text style={styles.buttonText}>Logout</Text>
 			</TouchableOpacity>
