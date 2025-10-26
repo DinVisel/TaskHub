@@ -1,79 +1,89 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Image } from "react-native";
-import api from "../../api/api";
+import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Location from "expo-location";
 import * as ImagePicker from "expo-image-picker";
+import { LinearGradient } from "expo-linear-gradient";
+import api from "../../api/api";
+import { colors, spacing, fonts, radii, shadow } from "../../theme";
 
 export default function PostTask() {
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
-	const [message, setMessage] = useState("");
-	const [city, setCity] = useState("");
-	const [coords, setCoords] = useState(null);
-	const [category, setCategory] = useState("");
-	const [image, setImage] = useState(null);
+        const [message, setMessage] = useState("");
+        const [city, setCity] = useState("");
+        const [coords, setCoords] = useState(null);
+        const [category, setCategory] = useState("");
+        const [image, setImage] = useState(null);
+        const [submitting, setSubmitting] = useState(false);
 
-	const handlePost = async () => {
-		try {
-			const payload = {
-				title,
-				description,
-				category,
-				image: imageUrl,
-			};
+        const handlePost = async () => {
+                try {
+                        setSubmitting(true);
+                        setMessage("");
 
-			const trimmedCity = city.trim();
-			const locationData = {};
+                        let imageUrl = image;
+                        if (image) {
+                                const formData = new FormData();
+                                formData.append("file", {
+                                        uri: image,
+                                        name: "task-image.jpg",
+                                        type: "image/jpeg",
+                                });
 
-			if (trimmedCity) {
-				locationData.address = trimmedCity;
-			}
+                                const uploadRes = await api.post("/upload", formData, {
+                                        headers: { "Content-Type": "multipart/form-data" },
+                                });
+                                imageUrl = uploadRes.data.url;
+                        }
 
-			if (coords?.lat != null && coords?.lng != null) {
-				locationData.coordinates = { ...coords };
-			}
+                        const trimmedCity = city.trim();
+                        const locationData = {};
 
-			if (Object.keys(locationData).length > 0) {
-				payload.location = locationData;
-			}
+                        if (trimmedCity) {
+                                locationData.address = trimmedCity;
+                        }
 
-			let imageUrl = null;
-			if (!image) {
-				const formData = new FormData();
-				formData.append("file", {
-					uri: image,
-					name: "upload.jpg",
-					type: "image/jpeg",
-				});
+                        if (coords?.lat != null && coords?.lng != null) {
+                                locationData.coordinates = { ...coords };
+                        }
 
-				const res = await api.post("/upload", formData, {
-					headers: { "Content-Type": "multipart/form-data" },
-				});
-				imageUrl = res.data.url;
-			}
+                        const payload = {
+                                title: title.trim(),
+                                description: description.trim(),
+                                category: category.trim(),
+                                image: imageUrl,
+                        };
 
-			const res = await api.post("/tasks", payload);
-			setMessage("Task posted successfully!");
-			setTitle("");
-			setDescription("");
-			setCategory("");
-			setCity("");
-			setImage(null);
-		} catch (err) {
-			setMessage(err.response?.data?.message || "Failed to post task");
-		}
-	};
+                        if (Object.keys(locationData).length > 0) {
+                                payload.location = locationData;
+                        }
 
-	const pickImage = async () => {
-		const result = await ImagePicker.launchImageLibraryAsync({
+                        await api.post("/tasks", payload);
+                        setMessage("Task posted successfully!");
+                        setTitle("");
+                        setDescription("");
+                        setCategory("");
+                        setCity("");
+                        setImage(null);
+                } catch (err) {
+                        setMessage(err.response?.data?.message || "Failed to post task");
+                } finally {
+                        setSubmitting(false);
+                }
+        };
+
+        const pickImage = async () => {
+                const result = await ImagePicker.launchImageLibraryAsync({
 			mediaTypes: ImagePicker.MediaTypeOptions.Images,
 			allowsEditing: true,
 			quality: 0.8,
 		});
 
-		if (!result.canceled) setImage(result.assets[0].url);
-	};
+                if (!result.canceled && result.assets?.length) {
+                        setImage(result.assets[0].uri);
+                }
+        };
 
 	useEffect(() => {
 		(async () => {
@@ -87,56 +97,176 @@ export default function PostTask() {
 		})();
 	}, []);
 
-	return (
-		<SafeAreaView style={styles.container}>
-			<Text style={styles.title}>Post a New Task</Text>
-			<TextInput
-				style={styles.input}
-				placeholder='Title'
-				value={title}
-				onChangeText={setTitle}
-			/>
-			<TextInput
-				style={styles.input}
-				placeholder='Category'
-				value={category}
-				onChangeText={setCategory}
-			/>
-			<TextInput
-				style={styles.input}
-				placeholder='City'
-				value={city}
-				onChangeText={setCity}
-			/>
-			<Button title='Pick Image' onPress={pickImage} />
-			{image && (
-				<Image
-					source={{ uri: image }}
-					style={{ height: 180, marginVertical: 10 }}
-				/>
-			)}
-			<TextInput
-				style={[styles.input, { height: 100 }]}
-				placeholder='Description'
-				value={description}
-				multiline
-				onChangeText={setDescription}
-			/>
-			<Button title='Submit' onPress={handlePost} />
-			{message ? <Text style={styles.message}>{message}</Text> : null}
-		</SafeAreaView>
-	);
+        return (
+                <SafeAreaView style={styles.safeArea}>
+                        <ScrollView contentContainerStyle={styles.content}>
+                                <LinearGradient
+                                        colors={[colors.primary, colors.secondary]}
+                                        style={styles.hero}
+                                >
+                                        <Text style={styles.heroTitle}>Share a new opportunity</Text>
+                                        <Text style={styles.heroSubtitle}>
+                                                Fill in the details so the right professionals can respond
+                                                fast.
+                                        </Text>
+                                </LinearGradient>
+
+                                <View style={styles.card}>
+                                        <Text style={styles.sectionTitle}>Task details</Text>
+                                        <TextInput
+                                                style={styles.input}
+                                                placeholder='Give it a clear title'
+                                                placeholderTextColor={colors.subtext}
+                                                value={title}
+                                                onChangeText={setTitle}
+                                        />
+                                        <TextInput
+                                                style={styles.input}
+                                                placeholder='Category (e.g. Cleaning)'
+                                                placeholderTextColor={colors.subtext}
+                                                value={category}
+                                                onChangeText={setCategory}
+                                        />
+                                        <TextInput
+                                                style={styles.input}
+                                                placeholder='City or address'
+                                                placeholderTextColor={colors.subtext}
+                                                value={city}
+                                                onChangeText={setCity}
+                                        />
+                                        <TextInput
+                                                style={[styles.input, styles.multiline]}
+                                                placeholder='Describe what needs to be done'
+                                                placeholderTextColor={colors.subtext}
+                                                value={description}
+                                                onChangeText={setDescription}
+                                                multiline
+                                                numberOfLines={4}
+                                        />
+
+                                        <TouchableOpacity style={styles.outlineButton} onPress={pickImage}>
+                                                <Text style={styles.outlineButtonText}>
+                                                        {image ? "Change image" : "Add a reference image"}
+                                                </Text>
+                                        </TouchableOpacity>
+
+                                        {image ? (
+                                                <Image source={{ uri: image }} style={styles.preview} />
+                                        ) : null}
+
+                                        <TouchableOpacity
+                                                style={[styles.button, submitting && styles.buttonDisabled]}
+                                                onPress={handlePost}
+                                                disabled={submitting}
+                                        >
+                                                {submitting ? (
+                                                        <ActivityIndicator color={colors.surface} />
+                                                ) : (
+                                                        <Text style={styles.buttonText}>Publish task</Text>
+                                                )}
+                                        </TouchableOpacity>
+
+                                        {message ? (
+                                                <Text
+                                                        style={[
+                                                                styles.message,
+                                                                message.includes("successfully")
+                                                                        ? styles.success
+                                                                        : styles.error,
+                                                        ]}
+                                                >
+                                                        {message}
+                                                </Text>
+                                        ) : null}
+                                </View>
+                        </ScrollView>
+                </SafeAreaView>
+        );
 }
 
 const styles = StyleSheet.create({
-	container: { flex: 1, padding: 20 },
-	title: { fontSize: 22, fontWeight: "bold", marginBottom: 20 },
-	input: {
-		borderWidth: 1,
-		borderColor: "#ccc",
-		padding: 10,
-		borderRadius: 8,
-		marginBottom: 12,
-	},
-	message: { marginTop: 10, color: "green" },
+        safeArea: { flex: 1, backgroundColor: colors.background },
+        content: {
+                padding: spacing.lg,
+                gap: spacing.lg,
+        },
+        hero: {
+                borderRadius: radii.lg,
+                padding: spacing.lg,
+                ...shadow.card,
+        },
+        heroTitle: {
+                color: colors.surface,
+                fontSize: fonts.title,
+                fontWeight: "700",
+        },
+        heroSubtitle: {
+                marginTop: spacing.sm,
+                color: "rgba(255,255,255,0.85)",
+                fontSize: fonts.body,
+                lineHeight: 22,
+        },
+        card: {
+                backgroundColor: colors.surface,
+                borderRadius: radii.lg,
+                padding: spacing.lg,
+                ...shadow.card,
+                gap: spacing.md,
+        },
+        sectionTitle: {
+                fontSize: fonts.subtitle,
+                fontWeight: "600",
+                color: colors.text,
+        },
+        input: {
+                borderWidth: 1,
+                borderColor: colors.border,
+                borderRadius: radii.sm,
+                paddingHorizontal: spacing.md,
+                paddingVertical: spacing.sm,
+                color: colors.text,
+                backgroundColor: "rgba(255,255,255,0.95)",
+        },
+        multiline: {
+                height: 120,
+                textAlignVertical: "top",
+        },
+        outlineButton: {
+                borderRadius: radii.pill,
+                borderWidth: 1,
+                borderColor: colors.primary,
+                paddingVertical: spacing.sm,
+                alignItems: "center",
+        },
+        outlineButtonText: {
+                color: colors.primary,
+                fontWeight: "600",
+        },
+        preview: {
+                height: 180,
+                borderRadius: radii.md,
+                marginTop: spacing.sm,
+                width: "100%",
+        },
+        button: {
+                backgroundColor: colors.accent,
+                borderRadius: radii.pill,
+                paddingVertical: spacing.sm + 4,
+                alignItems: "center",
+        },
+        buttonDisabled: {
+                opacity: 0.6,
+        },
+        buttonText: {
+                color: colors.surface,
+                fontWeight: "700",
+                fontSize: fonts.body,
+        },
+        message: {
+                marginTop: spacing.sm,
+                textAlign: "center",
+                fontWeight: "600",
+        },
+        success: { color: colors.success },
+        error: { color: colors.danger },
 });
