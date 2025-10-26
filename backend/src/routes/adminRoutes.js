@@ -5,6 +5,7 @@ import {
 	getAllTasks,
 	deleteTask,
 	getAllReviews,
+	getAdminAnalytics,
 } from "../controllers/adminController.js";
 import { protect, adminOnly } from "../middleware/authMiddleware.js";
 
@@ -16,5 +17,6 @@ router.delete("/users/:id", deleteUser);
 router.get("/tasks", getAllTasks);
 router.delete("/tasks/:id", deleteTask);
 router.get("/reviews", getAllReviews);
+router.get("/analytics", getAdminAnalytics);
 
 export default router;

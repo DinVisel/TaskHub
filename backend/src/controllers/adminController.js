@@ -34,3 +34,35 @@ export const getAllReviews = asyncHandler(async (req, res) => {
 		.populate("reviewee", "name");
 	res.json(reviews);
 });
+
+export const getAdminAnalytics = asyncHandler(async (req, res) => {
+	const totalUsers = await User.countDocuments();
+	const totalClients = await User.countDocuments({ role: "client" });
+	const totalWorkers = await User.countDocuments({ role: "worker" });
+	const totalTasks = await Task.countDocuments();
+	const completedTasks = await Task.countDocuments({ status: "completed" });
+
+	// total commission income
+	const commissionTransactions = await User.aggregate([
+		{ $unwind: "$transactions" },
+		{ $match: { "transactions.type": "commission" } },
+		{ $group: { _id: null, total: { $sum: "$transactions.amount" } } },
+	]);
+	const totalCommission = Math.abs(commissionTransactions[0]?.total || 0);
+
+	// total money in circulation (sum of all user balances)
+	const walletBalances = await User.aggregate([
+		{ $group: { _id: null, total: { $sum: "$walletBalance" } } },
+	]);
+	const totalWalletMoney = walletBalances[0]?.total || 0;
+
+	res.json({
+		totalUsers,
+		totalClients,
+		totalWorkers,
+		totalTasks,
+		completedTasks,
+		totalCommission,
+		totalWalletMoney,
+	});
+});
