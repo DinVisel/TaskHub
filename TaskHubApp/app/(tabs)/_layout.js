@@ -1,112 +1,72 @@
 import React from "react";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { View, Text, StyleSheet } from "react-native";
-import { colors } from "../../theme";
+import { Platform } from "react-native";
 
-const TabIcon = ({ icon, label, focused }) => {
-	return (
-		<View style={[styles.tabItem, focused && styles.tabItemActive]}>
-			<Ionicons
-				name={icon}
-				size={24}
-				color={focused ? colors.surface : colors.subtext}
-			/>
-			<Text
-				style={[styles.tabLabel, focused && styles.tabLabelActive]}
-				numberOfLines={1}
-				ellipsizeMode='clip'
-			>
-				{label}
-			</Text>
-		</View>
-	);
-};
-
-const buildScreenOptions = (icon, label) => ({
-	title: label,
-	tabBarIcon: ({ focused }) => (
-		<TabIcon icon={icon} label={label} focused={focused} />
-	),
-});
-
-export default function TabsLayout() {
+export default function Layout() {
 	return (
 		<Tabs
 			screenOptions={{
 				headerShown: false,
 				tabBarShowLabel: false,
-				tabBarActiveTintColor: colors.primary,
-				tabBarInactiveTintColor: colors.subtext,
-				tabBarHideOnKeyboard: true,
-				tabBarStyle: styles.tabBar,
-				tabBarItemStyle: styles.tabBarItem,
-				tabBarBackground: () => <View style={styles.tabBackground} />,
+				tabBarStyle: {
+					position: "absolute",
+					bottom: 25,
+					left: 20,
+					right: 20,
+					elevation: 0,
+					backgroundColor: "#ffffff",
+					borderRadius: 50,
+					height: 70,
+					shadowColor: "#000",
+					shadowOffset: { width: 0, height: 10 },
+					shadowOpacity: 0.1,
+					shadowRadius: 10,
+					marginBottom: Platform.OS === "ios" ? 20 : 10,
+				},
 			}}
 		>
-			<Tabs.Screen name='index' options={buildScreenOptions("home", "Home")} />
+			{/* Home Screen */}
 			<Tabs.Screen
-				name='post-task'
-				options={buildScreenOptions("add-circle", "Post Task")}
+				name='index' // corresponds to app/index.js
+				options={{
+					tabBarIcon: ({ focused }) => (
+						<Ionicons
+							name={focused ? "home" : "home-outline"}
+							size={26}
+							color={focused ? "#007bff" : "#999"}
+						/>
+					),
+				}}
 			/>
+
+			{/* Add Task Screen */}
 			<Tabs.Screen
-				name='account'
-				options={buildScreenOptions("person", "Account")}
+				name='post-task' // corresponds to app/add.js
+				options={{
+					tabBarIcon: ({ focused }) => (
+						<Ionicons
+							name={focused ? "add-circle" : "add-circle-outline"}
+							size={38}
+							color={focused ? "#007bff" : "#999"}
+						/>
+					),
+				}}
+			/>
+
+			{/* Profile Screen */}
+			<Tabs.Screen
+				name='account' // corresponds to app/profile.js
+				options={{
+					tabBarIcon: ({ focused }) => (
+						<Ionicons
+							name={focused ? "person" : "person-outline"}
+							size={26}
+							color={focused ? "#007bff" : "#999"}
+						/>
+					),
+				}}
 			/>
 		</Tabs>
 	);
 }
-
-const styles = StyleSheet.create({
-	tabBar: {
-		position: "absolute",
-		left: 20,
-		right: 20,
-		bottom: 24,
-		height: 80,
-		borderTopWidth: 0,
-		backgroundColor: "transparent",
-		elevation: 0,
-	},
-	tabBarItem: {
-		paddingVertical: 0,
-	},
-	tabBackground: {
-		flex: 1,
-		borderRadius: 999,
-		marginHorizontal: 4,
-		marginVertical: 8,
-		backgroundColor: colors.surface,
-		shadowColor: "rgba(15, 23, 42, 0.18)",
-		shadowOpacity: 1,
-		shadowOffset: { width: 0, height: 14 },
-		shadowRadius: 24,
-		elevation: 20,
-	},
-	tabItem: {
-		alignItems: "center",
-		justifyContent: "center",
-		gap: 6,
-		paddingVertical: 10,
-		paddingHorizontal: 12,
-		borderRadius: 20,
-	},
-	tabItemActive: {
-		backgroundColor: colors.primary,
-		shadowColor: "rgba(37, 99, 235, 0.3)",
-		shadowOpacity: 1,
-		shadowOffset: { width: 0, height: 8 },
-		shadowRadius: 16,
-		elevation: 10,
-	},
-	tabLabel: {
-		fontSize: 13,
-		color: colors.subtext,
-		fontWeight: "600",
-		maxWidth: 70,
-		textAlign: "center",
-	},
-	tabLabelActive: {
-		color: colors.surface,
-	},
-});
