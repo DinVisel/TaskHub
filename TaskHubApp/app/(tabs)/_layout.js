@@ -42,7 +42,7 @@ export default function Layout() {
 
 			{/* Add Task Screen */}
 			<Tabs.Screen
-				name='post-task' // corresponds to app/add.js
+				name='post-task'
 				options={{
 					tabBarIcon: ({ focused }) => (
 						<Ionicons
@@ -56,7 +56,7 @@ export default function Layout() {
 
 			{/* Profile Screen */}
 			<Tabs.Screen
-				name='account' // corresponds to app/profile.js
+				name='account'
 				options={{
 					tabBarIcon: ({ focused }) => (
 						<Ionicons
