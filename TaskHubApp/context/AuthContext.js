@@ -2,7 +2,15 @@ import React, { createContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../api/api";
 
-export const AuthContext = createContext();
+export const AuthContext = createContext({
+        user: null,
+        loading: true,
+        login: async () => {},
+        register: async () => {},
+        logout: async () => {},
+        refreshUser: async () => {},
+        updateUser: () => {},
+});
 
 export const AuthProvider = ({ children }) => {
 	const [user, setUser] = useState(null);
@@ -51,9 +59,29 @@ export const AuthProvider = ({ children }) => {
 		setUser(null);
 	};
 
-	return (
-		<AuthContext.Provider value={{ user, loading, login, register, logout }}>
-			{children}
-		</AuthContext.Provider>
-	);
+        const refreshUser = async () => {
+                const res = await api.get("/users/me");
+                setUser(res.data.user);
+                return res.data.user;
+        };
+
+        const applyUserUpdate = (nextUser) => {
+                setUser(nextUser);
+        };
+
+        return (
+                <AuthContext.Provider
+                        value={{
+                                user,
+                                loading,
+                                login,
+                                register,
+                                logout,
+                                refreshUser,
+                                updateUser: applyUserUpdate,
+                        }}
+                >
+                        {children}
+                </AuthContext.Provider>
+        );
 };
