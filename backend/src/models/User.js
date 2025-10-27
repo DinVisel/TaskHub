@@ -10,14 +10,15 @@ const userSchema = new mongoose.Schema(
 			lowercase: true,
 			trim: true,
 		},
-		role: {
-			type: String,
-			enum: ["client", "worker", "admin"],
-			default: "worker",
-		},
-		phone: { type: String, trim: true },
-		passwordHash: { type: String, required: true, select: false },
-		bio: { type: String, default: "" },
+                role: {
+                        type: String,
+                        enum: ["client", "worker", "admin"],
+                        default: "worker",
+                },
+                avatar: { type: String, default: "" },
+                phone: { type: String, trim: true },
+                passwordHash: { type: String, required: true, select: false },
+                bio: { type: String, default: "" },
 		location: {
 			city: { type: String, trim: true },
 			coordinates: {
@@ -60,28 +61,32 @@ const userSchema = new mongoose.Schema(
 
 // optional: expose a safe version for responses
 userSchema.methods.toSafeObject = function () {
-	const {
-		_id,
-		name,
-		email,
-		phone,
-		bio,
-		location,
-		rating,
-		completedTasks,
-		createdAt,
-	} = this;
-	return {
-		_id,
-		name,
-		email,
-		phone,
-		bio,
-		location,
-		rating,
-		completedTasks,
-		createdAt,
-	};
+        const {
+                _id,
+                name,
+                email,
+                phone,
+                avatar,
+                bio,
+                location,
+                rating,
+                completedTasks,
+                createdAt,
+                preferences,
+        } = this;
+        return {
+                _id,
+                name,
+                email,
+                phone,
+                avatar,
+                bio,
+                location,
+                rating,
+                completedTasks,
+                createdAt,
+                preferences,
+        };
 };
 
 export default mongoose.model("User", userSchema);
