@@ -23,6 +23,9 @@ export default function Layout() {
 					shadowOpacity: 0.1,
 					shadowRadius: 10,
 					marginBottom: Platform.OS === "ios" ? 20 : 10,
+					paddingTop: 10,
+					paddingHorizontal: 10,
+					marginHorizontal: 40,
 				},
 			}}
 		>
@@ -33,7 +36,7 @@ export default function Layout() {
 					tabBarIcon: ({ focused }) => (
 						<Ionicons
 							name={focused ? "home" : "home-outline"}
-							size={26}
+							size={30}
 							color={focused ? "#007bff" : "#999"}
 						/>
 					),
@@ -47,7 +50,7 @@ export default function Layout() {
 					tabBarIcon: ({ focused }) => (
 						<Ionicons
 							name={focused ? "add-circle" : "add-circle-outline"}
-							size={38}
+							size={30}
 							color={focused ? "#007bff" : "#999"}
 						/>
 					),
@@ -61,7 +64,7 @@ export default function Layout() {
 					tabBarIcon: ({ focused }) => (
 						<Ionicons
 							name={focused ? "person" : "person-outline"}
-							size={26}
+							size={30}
 							color={focused ? "#007bff" : "#999"}
 						/>
 					),
