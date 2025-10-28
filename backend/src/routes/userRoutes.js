@@ -6,6 +6,7 @@ import {
         getMyOffers,
         getMyTasks,
         getUserStats,
+        getPreferences,
         updatePreferences,
         updateProfile,
 } from "../controllers/userController.js";
@@ -16,6 +17,7 @@ router.get("/my-tasks", protect, restrictTo("client"), getMyTasks);
 router.get("/my-offers", protect, restrictTo("worker"), getMyOffers);
 router.get("/my-jobs", protect, restrictTo("worker"), getMyJobs);
 router.get("/stats", protect, getUserStats);
+router.get("/preferences", protect, getPreferences);
 router.patch("/preferences", protect, updatePreferences);
 router.get("/me", protect, getProfile);
 router.patch("/me", protect, updateProfile);

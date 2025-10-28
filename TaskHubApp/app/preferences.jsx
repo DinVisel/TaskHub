@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	View,
 	Text,
@@ -13,16 +13,53 @@ import api from "../api/api";
 import { colors, spacing, fonts, radii, shadow } from "../theme";
 
 export default function Preferences() {
-	const [categories, setCategories] = useState("Cleaning,Repair");
-	const [radius, setRadius] = useState("25");
+        const [categories, setCategories] = useState("");
+        const [radius, setRadius] = useState("");
+        const [saving, setSaving] = useState(false);
 
-	const save = async () => {
-		await api.patch("/users/preferences", {
-			categories: categories.split(",").map((c) => c.trim()),
-			radiusKm: parseInt(radius),
-		});
-		alert("Preferences saved!");
-	};
+        useEffect(() => {
+                const loadPreferences = async () => {
+                        try {
+                                const res = await api.get("/users/preferences");
+                                const prefCategories = res.data?.categories || [];
+                                setCategories(prefCategories.join(", "));
+
+                                if (typeof res.data?.radiusKm === "number") {
+                                        setRadius(String(res.data.radiusKm));
+                                } else {
+                                        setRadius("");
+                                }
+                        } catch (err) {
+                                console.log("Failed to load preferences", err.message);
+                        }
+                };
+
+                loadPreferences();
+        }, []);
+
+        const save = async () => {
+                const trimmedCategories = categories
+                        .split(",")
+                        .map((c) => c.trim())
+                        .filter(Boolean);
+                const radiusValue = Number.parseInt(radius, 10);
+
+                const payload = {
+                        categories: trimmedCategories,
+                        ...(Number.isNaN(radiusValue) ? {} : { radiusKm: radiusValue }),
+                };
+
+                try {
+                        setSaving(true);
+                        await api.patch("/users/preferences", payload);
+                        alert("Preferences saved!");
+                } catch (err) {
+                        console.log("Failed to save preferences", err.message);
+                        alert("We couldn't save your preferences. Please try again.");
+                } finally {
+                        setSaving(false);
+                }
+        };
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
@@ -62,10 +99,16 @@ export default function Preferences() {
 						first.
 					</Text>
 
-					<TouchableOpacity style={styles.button} onPress={save}>
-						<Text style={styles.buttonText}>Save preferences</Text>
-					</TouchableOpacity>
-				</View>
+                                        <TouchableOpacity
+                                                style={[styles.button, saving && styles.buttonDisabled]}
+                                                onPress={save}
+                                                disabled={saving}
+                                        >
+                                                <Text style={styles.buttonText}>
+                                                        {saving ? "Saving..." : "Save preferences"}
+                                                </Text>
+                                        </TouchableOpacity>
+                                </View>
 			</ScrollView>
 		</SafeAreaView>
 	);
@@ -121,13 +164,16 @@ const styles = StyleSheet.create({
 		lineHeight: 18,
 		marginTop: spacing.xs,
 	},
-	button: {
-		marginTop: spacing.lg,
-		backgroundColor: colors.primary,
-		paddingVertical: spacing.sm + 4,
-		borderRadius: radii.pill,
-		alignItems: "center",
-	},
+        button: {
+                marginTop: spacing.lg,
+                backgroundColor: colors.primary,
+                paddingVertical: spacing.sm + 4,
+                borderRadius: radii.pill,
+                alignItems: "center",
+        },
+        buttonDisabled: {
+                opacity: 0.7,
+        },
 	buttonText: {
 		color: colors.surface,
 		fontWeight: "700",

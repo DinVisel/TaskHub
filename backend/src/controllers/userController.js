@@ -115,10 +115,23 @@ export const updateProfile = asyncHandler(async (req, res) => {
         res.json({ user: user.toSafeObject() });
 });
 
+export const getPreferences = asyncHandler(async (req, res) => {
+        const user = await User.findById(req.user.id);
+        if (!user) throw new AppError("User not found", 404);
+
+        const preferences = user.preferences || { categories: [], radiusKm: 25 };
+
+        res.json(preferences);
+});
+
 export const updatePreferences = asyncHandler(async (req, res) => {
         const { categories, radiusKm } = req.body;
         const user = await User.findById(req.user.id);
         if (!user) throw new AppError("User not found", 404);
+
+        if (!user.preferences) {
+                user.preferences = { categories: [], radiusKm: 25 };
+        }
 
         if (categories !== undefined) {
                 if (Array.isArray(categories)) {

@@ -35,13 +35,15 @@ export const createTask = asyncHandler(async (req, res) => {
 });
 
 export const getTask = asyncHandler(async (req, res) => {
-	const task = await Task.findById(req.params.id).populate(
-		"postedBy",
-		"name email"
-	);
-	if (!task) throw new AppError("Task not found", 404);
+	const page = parseInt(req.query.page) || 1;
+	const limit = parseIn(req.query.limit) || 20;
+	const skip = (page - 1) * limit;
 
-	res.json({ task });
+	const tasks = await Task.find().skip(skip).limit(limit);
+	const total = await Task.countDocuments();
+	if (!tasks) throw new AppError("Task not found", 404);
+
+	res.json({ tasks, currentPage: page, totalPages: Math.ceil(total / limit) });
 });
 
 export const completeTask = asyncHandler(async (req, res) => {
