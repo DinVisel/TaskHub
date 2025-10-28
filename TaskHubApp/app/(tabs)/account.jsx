@@ -102,19 +102,19 @@ export default function Account() {
 						</Text>
 					</View>
 
-                                        <View style={styles.actions}>
-                                                <TouchableOpacity
-                                                        style={styles.actionButton}
-                                                        onPress={() => router.push("/edit-profile")}
-                                                >
-                                                        <Text style={styles.actionText}>✏️ Edit profile</Text>
-                                                </TouchableOpacity>
+					<View style={styles.actions}>
+						<TouchableOpacity
+							style={styles.actionButton}
+							onPress={() => router.push("/edit-profile")}
+						>
+							<Text style={styles.actionText}>✏️ Edit profile</Text>
+						</TouchableOpacity>
 
-                                                <TouchableOpacity
-                                                        style={styles.actionButton}
-                                                        onPress={() => router.push("/chat/messages")}
-                                                >
-                                                        <Text style={styles.actionText}>💬 Messages</Text>
+						<TouchableOpacity
+							style={styles.actionButton}
+							onPress={() => router.push("/chat/messages")}
+						>
+							<Text style={styles.actionText}>💬 Messages</Text>
 						</TouchableOpacity>
 
 						{user?.role === "admin" && (
