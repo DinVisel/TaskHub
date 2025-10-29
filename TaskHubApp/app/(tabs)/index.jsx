@@ -55,16 +55,33 @@ export default function Home() {
 	const { user } = useContext(AuthContext);
 
 	const scrollY = useRef(new Animated.Value(0)).current;
+	const searchRef = useRef(search);
+	const selectedCategoryRef = useRef(selectedCategory);
+
+	useEffect(() => {
+		searchRef.current = search;
+	}, [search]);
+
+	useEffect(() => {
+		selectedCategoryRef.current = selectedCategory;
+	}, [selectedCategory]);
 
 	const fetchCategoryTasks = useCallback(
-		async (categoryOverride = selectedCategory, searchOverride = search) => {
+		async (categoryOverride, searchOverride) => {
 			setLoadingTasks(true);
 			setError(null);
 			try {
+				const effectiveCategory =
+					categoryOverride !== undefined
+						? categoryOverride
+						: selectedCategoryRef.current;
+				const effectiveSearch =
+					searchOverride !== undefined ? searchOverride : searchRef.current;
+
 				const params = {};
-				if (searchOverride) params.search = searchOverride;
-				if (categoryOverride && categoryOverride !== "All") {
-					params.category = categoryOverride;
+				if (effectiveSearch) params.search = effectiveSearch;
+				if (effectiveCategory && effectiveCategory !== "All") {
+					params.category = effectiveCategory;
 				}
 
 				const res = await api.get("/tasks", { params });
@@ -76,7 +93,7 @@ export default function Home() {
 				setLoadingTasks(false);
 			}
 		},
-		[search, selectedCategory]
+		[]
 	);
 
 	const fetchRecommendedTasks = useCallback(async () => {
@@ -337,7 +354,7 @@ export default function Home() {
 						</View>
 					}
 					ListEmptyComponent={
-						!loadingTasks ? (
+						!loadingTasks && !loadingPreferences && !refreshing ? (
 							<View style={styles.emptyState}>
 								<Ionicons name='sparkles-outline' size={42} color={colors.primary} />
 								<Text style={styles.emptyTitle}>No matches just yet</Text>
