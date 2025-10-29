@@ -1,10 +1,10 @@
 import React, {
-        useCallback,
-        useContext,
-        useEffect,
-        useMemo,
-        useRef,
-        useState,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
 } from "react";
 import {
 	ActivityIndicator,
@@ -27,15 +27,15 @@ import { colors, spacing, fonts, radii } from "../../theme.js";
 import { AuthContext } from "../../context/AuthContext";
 
 const FALLBACK_CATEGORIES = [
-        "Cleaning",
-        "Repair",
-        "Programming",
-        "Tutoring",
-        "Delivery",
+	"Cleaning",
+	"Repair",
+	"Programming",
+	"Tutoring",
+	"Delivery",
 ];
 
 const FALLBACK_CARD_IMAGE_URL =
-        "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=900&q=60";
+	"https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=900&q=60";
 const FALLBACK_AVATAR_URL = "https://i.pravatar.cc/100";
 
 export default function Home() {
@@ -160,45 +160,38 @@ export default function Home() {
 		router.push("/preferences");
 	};
 
-        const handleAccount = () => {
-                router.push("/(tabs)/account");
-        };
+	const handleAccount = () => {
+		router.push("/(tabs)/account");
+	};
 
-        const handleTaskPress = useCallback((taskId) => {
-                router.push(`/chat/${taskId}`);
-        }, []);
+	const handleTaskPress = useCallback((taskId) => {
+		router.push(`/chat/${taskId}`);
+	}, []);
 
-        const keyExtractor = useCallback((item) => item._id, []);
+	const keyExtractor = useCallback((item) => item._id, []);
 
-        const renderTaskItem = useCallback(
-                ({ item }) => <TaskCard item={item} onPress={handleTaskPress} />,
-                [handleTaskPress]
-        );
+	const renderTaskItem = useCallback(
+		({ item }) => <TaskCard item={item} onPress={handleTaskPress} />,
+		[handleTaskPress]
+	);
 
-        const onScroll = Animated.event(
-                [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-                { useNativeDriver: false }
-        );
+	const onScroll = Animated.event(
+		[{ nativeEvent: { contentOffset: { y: scrollY } } }],
+		{ useNativeDriver: false }
+	);
 
 	return (
 		<SafeAreaView style={styles.container}>
 			<StatusBar barStyle='light-content' />
-			<Animated.View
-				pointerEvents='none'
-				style={[styles.condensedHeader, { opacity: condensedHeaderOpacity }]}
-			>
-				<Text style={styles.condensedTitle}>TaskHub</Text>
-				<Text style={styles.condensedSubtitle}>Curated gigs near you</Text>
-			</Animated.View>
 
 			{error ? (
 				<View style={styles.messageContainer}>
 					<Text style={styles.errorText}>{error}</Text>
 				</View>
 			) : (
-                                <Animated.FlatList
-                                        data={tasks}
-                                        keyExtractor={keyExtractor}
+				<Animated.FlatList
+					data={tasks}
+					keyExtractor={keyExtractor}
 					onScroll={onScroll}
 					scrollEventThrottle={16}
 					contentContainerStyle={styles.listContent}
@@ -347,7 +340,7 @@ export default function Home() {
 							</View>
 						) : null
 					}
-                                        renderItem={renderTaskItem}
+					renderItem={renderTaskItem}
 				/>
 			)}
 
@@ -361,72 +354,75 @@ export default function Home() {
 }
 
 const TaskCard = React.memo(function TaskCard({ item, onPress }) {
-        const cityName = useMemo(() => {
-                const address = item?.location?.address?.trim();
-                const city = item?.location?.city?.trim();
-                return address || city || "Unknown";
-        }, [item?.location?.address, item?.location?.city]);
+	const cityName = useMemo(() => {
+		const address = item?.location?.address?.trim();
+		const city = item?.location?.city?.trim();
+		return address || city || "Unknown";
+	}, [item?.location?.address, item?.location?.city]);
 
-        const coverImage = useMemo(() => {
-                if (item?.image && item.image.startsWith("http")) {
-                        return { uri: item.image };
-                }
-                return { uri: FALLBACK_CARD_IMAGE_URL };
-        }, [item?.image]);
+	const coverImage = useMemo(() => {
+		if (item?.image && item.image.startsWith("http")) {
+			return { uri: item.image };
+		}
+		return { uri: FALLBACK_CARD_IMAGE_URL };
+	}, [item?.image]);
 
-        const avatarSource = useMemo(() => {
-                const avatar = item?.ownerAvatar;
-                if (avatar && avatar.startsWith("http")) {
-                        return { uri: avatar };
-                }
-                return { uri: FALLBACK_AVATAR_URL };
-        }, [item?.ownerAvatar]);
+	const avatarSource = useMemo(() => {
+		const avatar = item?.ownerAvatar;
+		if (avatar && avatar.startsWith("http")) {
+			return { uri: avatar };
+		}
+		return { uri: FALLBACK_AVATAR_URL };
+	}, [item?.ownerAvatar]);
 
-        const budgetLabel = useMemo(() => {
-                const amount = item?.budget?.amount;
-                if (!amount) return null;
-                const currency = item?.budget?.currency || "USD";
-                return `${amount} ${currency}`;
-        }, [item?.budget?.amount, item?.budget?.currency]);
+	const budgetLabel = useMemo(() => {
+		const amount = item?.budget?.amount;
+		if (!amount) return null;
+		const currency = item?.budget?.currency || "USD";
+		return `${amount} ${currency}`;
+	}, [item?.budget?.amount, item?.budget?.currency]);
 
-        const handlePress = useCallback(() => {
-                onPress(item._id);
-        }, [item._id, onPress]);
+	const handlePress = useCallback(() => {
+		onPress(item._id);
+	}, [item._id, onPress]);
 
-        return (
-                <TouchableOpacity onPress={handlePress} style={styles.card} activeOpacity={0.9}>
-                        <Image source={coverImage} style={styles.cardImage} />
-                        <View style={styles.cardBody}>
-                                <View style={styles.cardHeader}>
-                                        <View>
-                                                <Text style={styles.title}>{item.title}</Text>
-                                                <View style={styles.badge}>
-                                                        <Ionicons name='pricetag' size={12} color={colors.accent} />
-                                                        <Text style={styles.badgeText}>{item.category || "General"}</Text>
-                                                </View>
-                                        </View>
-                                        <View style={styles.avatarWrapper}>
-                                                <Image source={avatarSource} style={styles.avatar} />
-                                        </View>
-                                </View>
-                                <Text style={styles.desc} numberOfLines={2}>
-                                        {item.description ||
-                                                "Tap to see more details about this opportunity."}
-                                </Text>
-                                <View style={styles.cardFooter}>
-                                        <View style={styles.footerLeft}>
-                                                <Ionicons name='location-outline' size={16} color={colors.subtext} />
-                                                <Text style={styles.city}>{cityName}</Text>
-                                        </View>
-                                        {budgetLabel ? (
-                                                <View style={styles.priceTag}>
-                                                        <Text style={styles.priceText}>{budgetLabel}</Text>
-                                                </View>
-                                        ) : null}
-                                </View>
-                        </View>
-                </TouchableOpacity>
-        );
+	return (
+		<TouchableOpacity
+			onPress={handlePress}
+			style={styles.card}
+			activeOpacity={0.9}
+		>
+			<Image source={coverImage} style={styles.cardImage} />
+			<View style={styles.cardBody}>
+				<View style={styles.cardHeader}>
+					<View>
+						<Text style={styles.title}>{item.title}</Text>
+						<View style={styles.badge}>
+							<Ionicons name='pricetag' size={12} color={colors.accent} />
+							<Text style={styles.badgeText}>{item.category || "General"}</Text>
+						</View>
+					</View>
+					<View style={styles.avatarWrapper}>
+						<Image source={avatarSource} style={styles.avatar} />
+					</View>
+				</View>
+				<Text style={styles.desc} numberOfLines={2}>
+					{item.description || "Tap to see more details about this opportunity."}
+				</Text>
+				<View style={styles.cardFooter}>
+					<View style={styles.footerLeft}>
+						<Ionicons name='location-outline' size={16} color={colors.subtext} />
+						<Text style={styles.city}>{cityName}</Text>
+					</View>
+					{budgetLabel ? (
+						<View style={styles.priceTag}>
+							<Text style={styles.priceText}>{budgetLabel}</Text>
+						</View>
+					) : null}
+				</View>
+			</View>
+		</TouchableOpacity>
+	);
 });
 
 const styles = StyleSheet.create({
