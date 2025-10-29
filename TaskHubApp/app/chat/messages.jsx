@@ -1,28 +1,51 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
 	View,
 	Text,
 	TouchableOpacity,
 	FlatList,
 	StyleSheet,
+	ActivityIndicator,
 } from "react-native";
 import api from "../../api/api";
 import { router } from "expo-router";
 
 export default function Messages() {
 	const [threads, setThreads] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [refreshing, setRefreshing] = useState(false);
+
+	const fetchThreads = useCallback(async () => {
+		try {
+			const res = await api.get("/messages/overview");
+			setThreads(res.data.threads || []);
+		} catch (err) {
+			console.log("Error loading messages:", err.message);
+		}
+	}, []);
 
 	useEffect(() => {
-		const fetchThreads = async () => {
-			try {
-				const res = await api.get("/messages/overview");
-				setThreads(res.data.threads);
-			} catch (err) {
-				console.log("Error loading messages:", err.message);
-			}
+		const loadThreads = async () => {
+			setLoading(true);
+			await fetchThreads();
+			setLoading(false);
 		};
-		fetchThreads();
-	}, []);
+
+		loadThreads();
+	}, [fetchThreads]);
+
+	const handleRefresh = useCallback(async () => {
+		setRefreshing(true);
+		await fetchThreads();
+		setRefreshing(false);
+	}, [fetchThreads]);
+
+	if (loading)
+		return (
+			<View style={styles.center}>
+				<ActivityIndicator size='large' color='#007AFF' />
+			</View>
+		);
 
 	if (threads.length === 0)
 		return (
@@ -36,6 +59,8 @@ export default function Messages() {
 			<FlatList
 				data={threads}
 				keyExtractor={(item) => item.taskId}
+				refreshing={refreshing}
+				onRefresh={handleRefresh}
 				renderItem={({ item }) => (
 					<TouchableOpacity
 						style={styles.thread}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
 	View,
 	Text,
@@ -7,6 +7,7 @@ import {
 	ActivityIndicator,
 	StyleSheet,
 	TouchableOpacity,
+	RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
@@ -18,8 +19,9 @@ export default function AdminPanel() {
 	const [tasks, setTasks] = useState([]);
 	const [reviews, setReviews] = useState([]);
 	const [loading, setLoading] = useState(true);
+	const [refreshing, setRefreshing] = useState(false);
 
-	const fetchData = async () => {
+	const fetchData = useCallback(async () => {
 		try {
 			const [u, t, r] = await Promise.all([
 				api.get("/admin/users"),
@@ -34,7 +36,13 @@ export default function AdminPanel() {
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, []);
+
+	const handleRefresh = useCallback(async () => {
+		setRefreshing(true);
+		await fetchData();
+		setRefreshing(false);
+	}, [fetchData]);
 
 	const deleteUser = async (id) => {
 		await api.delete(`/admin/users/${id}`);
@@ -48,7 +56,7 @@ export default function AdminPanel() {
 
 	useEffect(() => {
 		fetchData();
-	}, []);
+	}, [fetchData]);
 
 	if (loading)
 		return (
@@ -71,7 +79,12 @@ export default function AdminPanel() {
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
-			<ScrollView contentContainerStyle={styles.content}>
+			<ScrollView
+				contentContainerStyle={styles.content}
+				refreshControl={
+					<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+				}
+			>
 				<LinearGradient
 					colors={[colors.primary, colors.secondary]}
 					style={styles.header}

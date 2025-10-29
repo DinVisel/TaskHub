@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useCallback } from "react";
 import {
 	View,
 	Text,
@@ -6,6 +6,8 @@ import {
 	Image,
 	TouchableOpacity,
 	ScrollView,
+	RefreshControl,
+	ActivityIndicator,
 } from "react-native";
 import { AuthContext } from "../../context/AuthContext";
 import { router } from "expo-router";
@@ -19,14 +21,23 @@ export default function Account() {
 	const [reviews, setReviews] = useState([]);
 	const [average, setAverage] = useState(0);
 	const [balance, setBalance] = useState(null);
+	const [loading, setLoading] = useState(true);
+	const [refreshing, setRefreshing] = useState(false);
 
-	useEffect(() => {
-		if (!user?._id) return;
+	const userId = user?._id;
 
-		const fetchReviews = async () => {
+	const loadAccountData = useCallback(
+		async ({ showLoader = false } = {}) => {
+			if (!userId) return;
+
+			if (showLoader) setLoading(true);
 			try {
-				const res = await api.get(`/reviews/user/${user._id}`);
-				const fetchedReviews = res.data.reviews || [];
+				const [reviewsRes, walletRes] = await Promise.all([
+					api.get(`/reviews/user/${userId}`),
+					api.get("/wallet"),
+				]);
+
+				const fetchedReviews = reviewsRes.data.reviews || [];
 				setReviews(fetchedReviews);
 
 				if (fetchedReviews.length > 0) {
@@ -36,32 +47,49 @@ export default function Account() {
 				} else {
 					setAverage("0.0");
 				}
-			} catch (err) {
-				console.log("Failed to load reviews:", err.message);
-			}
-		};
 
-		fetchReviews();
-	}, [user?._id]);
+				setBalance(walletRes.data?.walletBalance ?? 0);
+			} catch (err) {
+				console.log("Failed to load account info:", err.message);
+			} finally {
+				if (showLoader) setLoading(false);
+			}
+		},
+		[userId]
+	);
 
 	useEffect(() => {
-		if (!user?._id) return;
+		if (!userId) {
+			setLoading(false);
+			return;
+		}
 
-		const fetchWallet = async () => {
-			try {
-				const res = await api.get("/wallet");
-				setBalance(res.data?.walletBalance ?? 0);
-			} catch (err) {
-				console.log("Failed to load wallet:", err.message);
-			}
-		};
+		loadAccountData({ showLoader: true });
+	}, [loadAccountData, userId]);
 
-		fetchWallet();
-	}, [user?._id]);
+	const handleRefresh = useCallback(async () => {
+		if (!userId) return;
+
+		setRefreshing(true);
+		await loadAccountData();
+		setRefreshing(false);
+	}, [loadAccountData, userId]);
+
+	if (loading)
+		return (
+			<View style={styles.loadingContainer}>
+				<ActivityIndicator size='large' color={colors.primary} />
+			</View>
+		);
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
-			<ScrollView contentContainerStyle={styles.content}>
+			<ScrollView
+				contentContainerStyle={styles.content}
+				refreshControl={
+					<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+				}
+			>
 				<LinearGradient
 					colors={[colors.primary, colors.secondary]}
 					style={styles.header}
@@ -252,5 +280,11 @@ const styles = StyleSheet.create({
 		color: colors.surface,
 		fontWeight: "700",
 		fontSize: fonts.body,
+	},
+	loadingContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: colors.background,
 	},
 });

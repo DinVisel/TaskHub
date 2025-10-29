@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, {
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
+} from "react";
 import {
 	ActivityIndicator,
 	FlatList,
@@ -37,6 +43,21 @@ export default function ChatDetail() {
 	const [loading, setLoading] = useState(true);
 	const [sending, setSending] = useState(false);
 	const [error, setError] = useState("");
+	const [refreshing, setRefreshing] = useState(false);
+
+	const fetchThread = useCallback(async () => {
+		if (!taskId) return null;
+
+		const [taskRes, messagesRes] = await Promise.all([
+			api.get(`/tasks/${taskId}`),
+			api.get(`/messages/${taskId}`),
+		]);
+
+		return {
+			task: taskRes.data.task,
+			messages: normalizeMessages(messagesRes.data.messages),
+		};
+	}, [taskId]);
 
 	useEffect(() => {
 		let isMounted = true;
@@ -46,15 +67,13 @@ export default function ChatDetail() {
 
 			try {
 				setLoading(true);
-				const [taskRes, messagesRes] = await Promise.all([
-					api.get(`/tasks/${taskId}`),
-					api.get(`/messages/${taskId}`),
-				]);
+				setError("");
+				const data = await fetchThread();
 
-				if (!isMounted) return;
+				if (!isMounted || !data) return;
 
-				setTask(taskRes.data.task);
-				setMessages(normalizeMessages(messagesRes.data.messages));
+				setTask(data.task);
+				setMessages(data.messages);
 			} catch (err) {
 				if (!isMounted) return;
 				setError(err.response?.data?.message || "Failed to load chat");
@@ -68,7 +87,26 @@ export default function ChatDetail() {
 		return () => {
 			isMounted = false;
 		};
-	}, [taskId]);
+	}, [fetchThread, taskId]);
+
+	const handleRefresh = useCallback(async () => {
+		if (!taskId) return;
+
+		try {
+			setRefreshing(true);
+			const data = await fetchThread();
+
+			if (data) {
+				setTask(data.task);
+				setMessages(data.messages);
+				setError("");
+			}
+		} catch (err) {
+			setError(err.response?.data?.message || "Failed to refresh chat");
+		} finally {
+			setRefreshing(false);
+		}
+	}, [fetchThread, taskId]);
 
 	const counterpartId = useMemo(() => {
 		if (!user?._id) return null;
@@ -205,6 +243,8 @@ export default function ChatDetail() {
 				keyExtractor={(item) => item._id || item.id}
 				renderItem={renderMessage}
 				contentContainerStyle={styles.list}
+				refreshing={refreshing}
+				onRefresh={handleRefresh}
 			/>
 
 			<KeyboardAvoidingView

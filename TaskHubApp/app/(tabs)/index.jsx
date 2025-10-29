@@ -50,6 +50,7 @@ export default function Home() {
 	const [loadingPreferences, setLoadingPreferences] = useState(true);
 	const [loadingTasks, setLoadingTasks] = useState(false);
 	const [error, setError] = useState(null);
+	const [refreshing, setRefreshing] = useState(false);
 
 	const { user } = useContext(AuthContext);
 
@@ -180,6 +181,12 @@ export default function Home() {
 		{ useNativeDriver: false }
 	);
 
+	const handleRefresh = useCallback(async () => {
+		setRefreshing(true);
+		await loadPreferences();
+		setRefreshing(false);
+	}, [loadPreferences]);
+
 	return (
 		<SafeAreaView style={styles.container}>
 			<StatusBar barStyle='light-content' />
@@ -194,6 +201,8 @@ export default function Home() {
 					keyExtractor={keyExtractor}
 					onScroll={onScroll}
 					scrollEventThrottle={16}
+					refreshing={refreshing}
+					onRefresh={handleRefresh}
 					contentContainerStyle={styles.listContent}
 					ListHeaderComponent={
 						<View>

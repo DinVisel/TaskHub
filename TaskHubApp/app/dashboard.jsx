@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useCallback, useEffect, useState, useContext } from "react";
 import {
 	View,
 	Text,
 	ActivityIndicator,
 	StyleSheet,
 	ScrollView,
+	RefreshControl,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import api from "../api/api";
@@ -13,14 +14,26 @@ import { AuthContext } from "../context/AuthContext";
 export default function Dashboard() {
 	const { user } = useContext(AuthContext);
 	const [stats, setStats] = useState(null);
+	const [refreshing, setRefreshing] = useState(false);
 
-	useEffect(() => {
-		const fetchStats = async () => {
+	const fetchStats = useCallback(async () => {
+		try {
 			const res = await api.get("/users/stats");
 			setStats(res.data);
-		};
-		fetchStats();
+		} catch (error) {
+			console.error("Failed to fetch stats", error);
+		}
 	}, []);
+
+	const handleRefresh = useCallback(async () => {
+		setRefreshing(true);
+		await fetchStats();
+		setRefreshing(false);
+	}, [fetchStats]);
+
+	useEffect(() => {
+		fetchStats();
+	}, [fetchStats]);
 
 	if (!stats)
 		return (
@@ -30,7 +43,12 @@ export default function Dashboard() {
 		);
 
 	return (
-		<ScrollView style={styles.container}>
+		<ScrollView
+			style={styles.container}
+			refreshControl={
+				<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+			}
+		>
 			<LinearGradient colors={["#00C6FF", "#007AFF"]} style={styles.header}>
 				<Text style={styles.headerTitle}>
 					{user.role === "client" ? "Client Dashboard" : "Worker Dashboard"}

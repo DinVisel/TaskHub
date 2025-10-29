@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
 	View,
 	Text,
@@ -6,6 +6,7 @@ import {
 	ScrollView,
 	StyleSheet,
 	TouchableOpacity,
+	RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
@@ -16,29 +17,48 @@ export default function Wallet() {
 	const [balance, setBalance] = useState(0);
 	const [amount, setAmount] = useState("");
 	const [transactions, setTransactions] = useState([]);
+	const [refreshing, setRefreshing] = useState(false);
 
-	const fetchWallet = async () => {
-		const res = await api.get("/wallet");
-		setBalance(res.data.walletBalance);
-		const history = Array.isArray(res.data.transactions)
-			? [...res.data.transactions].reverse()
-			: [];
-		setTransactions(history);
-	};
+	const fetchWallet = useCallback(async () => {
+		try {
+			const res = await api.get("/wallet");
+			setBalance(res.data.walletBalance);
+			const history = Array.isArray(res.data.transactions)
+				? [...res.data.transactions].reverse()
+				: [];
+			setTransactions(history);
+		} catch (err) {
+			console.log("Failed to load wallet:", err.message);
+		}
+	}, []);
 
 	const addFunds = async () => {
 		await api.post("/wallet/add", { amount: parseFloat(amount) });
 		setAmount("");
-		fetchWallet();
+		await fetchWallet();
 	};
 
 	useEffect(() => {
 		fetchWallet();
-	}, []);
+	}, [fetchWallet]);
+
+	const handleRefresh = useCallback(async () => {
+		setRefreshing(true);
+		try {
+			await fetchWallet();
+		} finally {
+			setRefreshing(false);
+		}
+	}, [fetchWallet]);
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
-			<ScrollView contentContainerStyle={styles.content}>
+			<ScrollView
+				contentContainerStyle={styles.content}
+				refreshControl={
+					<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+				}
+			>
 				<LinearGradient
 					colors={[colors.primary, colors.secondary]}
 					style={styles.balanceCard}
