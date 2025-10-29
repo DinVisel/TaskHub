@@ -4,9 +4,10 @@
 	"main": "src/server.js",
 	"type": "module",
 	"scripts": {
-		"dev": "nodemon src/server.js",
-		"start": "node src/server.js",
-		"test": "jest --detectOpenHandles --forceExit"
+                "dev": "nodemon src/server.js",
+                "start": "node src/server.js",
+                "test": "jest --detectOpenHandles --forceExit",
+                "seed:test": "node src/scripts/resetTestData.js"
 	},
 	"keywords": [],
 	"author": "",
