@@ -86,16 +86,22 @@ export const getUserThreads = asyncHandler(async (req, res) => {
 
         const populated = await Promise.all(
                 threads.map(async (t) => {
-                        const task = await Task.findById(t._id);
+                        const task = await Task.findById(t._id).select("title");
+                        const taskId = t._id?.toString();
+                        const lastSenderId =
+                                t.lastSenderId instanceof mongoose.Types.ObjectId
+                                        ? t.lastSenderId.toString()
+                                        : t.lastSenderId;
+
                         return {
-                                taskId: t._id,
+                                taskId,
                                 taskTitle: task?.title || "Unknown Task",
                                 lastMessage: t.lastMessage,
-                                lastSenderId: t.lastSenderId,
+                                lastSenderId,
                                 lastMessageAt: t.lastCreatedAt,
                         };
                 })
         );
 
-	res.json({ threads: populated });
+        res.json({ threads: populated });
 });

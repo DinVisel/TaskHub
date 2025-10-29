@@ -109,8 +109,8 @@ export default function EditProfile() {
 				<View style={styles.card}>
 					<View style={styles.avatarPreview}>
 						<Image source={{ uri: previewSource }} style={styles.avatarImage} />
-						<TouchableOpacity onPress={pickImage}>
-							<Text>Pick Avatar</Text>
+						<TouchableOpacity style={styles.avatarButton} onPress={pickImage}>
+							<Text style={styles.buttonText}>Pick Avatar</Text>
 						</TouchableOpacity>
 					</View>
 
@@ -240,6 +240,13 @@ const styles = StyleSheet.create({
 		borderWidth: 3,
 		borderColor: colors.surface,
 		backgroundColor: colors.border,
+	},
+	avatarButton: {
+		backgroundColor: colors.primary,
+		paddingVertical: spacing.md / 1.25,
+		paddingHorizontal: spacing.lg,
+		borderRadius: radii.pill,
+		alignItems: "center",
 	},
 	fieldGroup: {
 		gap: spacing.xs,
