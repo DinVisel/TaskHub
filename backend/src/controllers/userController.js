@@ -6,55 +6,53 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import AppError from "../utils/appError.js";
 
 export const getMyTasks = asyncHandler(async (req, res) => {
-	if (req.user.role !== "client")
-		throw new AppError("Only clients can view their posted tasks", 403);
+        if (req.user.role !== "user")
+                throw new AppError("Only standard users can view their tasks", 403);
 
-	const tasks = await Task.find({ postedBy: req.user.id });
-	res.json({ tasks });
+        const tasks = await Task.find({ postedBy: req.user.id });
+        res.json({ tasks });
 });
 
 export const getMyOffers = asyncHandler(async (req, res) => {
-	if (req.user.role !== "worker")
-		throw new AppError("Only workers can view their offers", 403);
+        if (req.user.role !== "user")
+                throw new AppError("Only standard users can view their offers", 403);
 
-	const offers = await Offer.find({ applicantId: req.user.id });
-	res.json({ offers });
+        const offers = await Offer.find({ applicantId: req.user.id });
+        res.json({ offers });
 });
 
 export const getMyJobs = asyncHandler(async (req, res) => {
-	if (req.user.role !== "worker")
-		throw new AppError("Only workers can view assigned jobs", 403);
+        if (req.user.role !== "user")
+                throw new AppError("Only standard users can view assigned jobs", 403);
 
-	const tasks = await Task.find({
-		assignedTo: req.user.id,
-		status: "in_progress",
-	});
-	res.json({ tasks });
+        const tasks = await Task.find({
+                assignedTo: req.user.id,
+                status: "in_progress",
+        });
+        res.json({ tasks });
 });
 
 export const getUserStats = asyncHandler(async (req, res) => {
         const userId = req.user._id;
         const role = req.user.role;
 
-	let postedTasks = 0;
-	let completedTask = 0;
-	let offersMade = 0;
-	let averageRating = 0;
-	let totalEarnings = 0;
+        if (role !== "user")
+                throw new AppError("Statistics are available for standard users only", 403);
 
-	if (role === "client") {
-		postedTasks = await Task.countDocuments({ postedBy: userId });
-		completedTask = await Task.countDocuments({
-			postedBy: userId,
-			status: "completed",
-		});
-	} else {
-		offersMade = await Offer.countDocuments({ postedBy: userId });
-		completedTask = await Task.countDocuments({
-			assignedTo: userId,
-			status: "completed",
-		});
-	}
+        const postedTasks = await Task.countDocuments({ postedBy: userId });
+        const completedAsPoster = await Task.countDocuments({
+                postedBy: userId,
+                status: "completed",
+        });
+        const offersMade = await Offer.countDocuments({ applicantId: userId });
+        const completedAsWorker = await Task.countDocuments({
+                assignedTo: userId,
+                status: "completed",
+        });
+
+        const completedTask = completedAsWorker;
+        let averageRating = 0;
+        let totalEarnings = 0;
 
 	const reviews = await Review.find({ reviewee: userId });
 	if (reviews.length > 0) {
@@ -66,7 +64,7 @@ export const getUserStats = asyncHandler(async (req, res) => {
 		assignedTo: userId,
 		status: "completed",
 	});
-	totalEarnings = doneTasks.reduce((sum, t) => sum + (t.budget || 0), 0);
+        totalEarnings = doneTasks.reduce((sum, t) => sum + (t.budget || 0), 0);
 
         res.json({
                 role,
@@ -75,6 +73,7 @@ export const getUserStats = asyncHandler(async (req, res) => {
                 offersMade,
                 averageRating,
                 totalEarnings,
+                completedAsPoster,
         });
 });
 
@@ -86,7 +85,7 @@ export const getProfile = asyncHandler(async (req, res) => {
 });
 
 export const updateProfile = asyncHandler(async (req, res) => {
-        const { name, phone, bio, avatar, location } = req.body;
+        const { name, phone, bio, avatar, location, identification } = req.body;
         const user = await User.findById(req.user.id);
         if (!user) throw new AppError("User not found", 404);
 
@@ -94,6 +93,12 @@ export const updateProfile = asyncHandler(async (req, res) => {
         if (phone !== undefined) user.phone = phone;
         if (bio !== undefined) user.bio = bio;
         if (avatar !== undefined) user.avatar = avatar;
+        if (identification !== undefined) {
+                if (typeof identification !== "string")
+                        throw new AppError("Identification must be a string", 400);
+
+                user.identification = identification.trim();
+        }
 
         if (location && typeof location === "object") {
                 user.location = user.location || {};

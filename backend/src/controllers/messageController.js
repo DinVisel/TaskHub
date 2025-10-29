@@ -25,9 +25,14 @@ const canChat = async (userId, taskId) => {
 
 // GET /api/messages/:taskId  -> history for a task
 export const getTaskMessages = asyncHandler(async (req, res) => {
-	const { taskId } = req.params;
-	const { ok, reason } = await canChat(req.user.id, taskId);
-	if (!ok) throw new AppError(reason, 403);
+        const { taskId } = req.params;
+        if (!req.user.hasIdentification)
+                throw new AppError(
+                        "Identification is required to access task messages",
+                        403
+                );
+        const { ok, reason } = await canChat(req.user.id, taskId);
+        if (!ok) throw new AppError(reason, 403);
 
         const messages = await Message.find({ taskId })
                 .sort({ createdAt: 1 })
@@ -39,10 +44,16 @@ export const getTaskMessages = asyncHandler(async (req, res) => {
 
 // POST /api/messages  -> send via REST (fallback/testing)
 export const sendMessageREST = asyncHandler(async (req, res) => {
-	const { taskId, receiverId, content } = req.body;
-	if (!taskId || !receiverId || !content) {
-		throw new AppError("taskId, receiverId, content are required", 400);
-	}
+        const { taskId, receiverId, content } = req.body;
+        if (!taskId || !receiverId || !content) {
+                throw new AppError("taskId, receiverId, content are required", 400);
+        }
+
+        if (!req.user.hasIdentification)
+                throw new AppError(
+                        "Identification is required before sending messages",
+                        403
+                );
 
 	const { ok, reason } = await canChat(req.user.id, taskId);
 	if (!ok) throw new AppError(reason, 403);
@@ -59,6 +70,11 @@ export const sendMessageREST = asyncHandler(async (req, res) => {
 
 export const getUserThreads = asyncHandler(async (req, res) => {
         const userId = req.user.id;
+        if (!req.user.hasIdentification)
+                throw new AppError(
+                        "Identification is required to access message threads",
+                        403
+                );
         if (!mongoose.Types.ObjectId.isValid(userId)) {
                 throw new AppError("Invalid user id", 400);
         }

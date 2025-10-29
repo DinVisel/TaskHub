@@ -36,11 +36,14 @@ export const getAllReviews = asyncHandler(async (req, res) => {
 });
 
 export const getAdminAnalytics = asyncHandler(async (req, res) => {
-	const totalUsers = await User.countDocuments();
-	const totalClients = await User.countDocuments({ role: "client" });
-	const totalWorkers = await User.countDocuments({ role: "worker" });
-	const totalTasks = await Task.countDocuments();
-	const completedTasks = await Task.countDocuments({ status: "completed" });
+        const totalUsers = await User.countDocuments();
+        const totalStandardUsers = await User.countDocuments({ role: "user" });
+        const totalIdentifiedUsers = await User.countDocuments({
+                role: "user",
+                identification: { $ne: "" },
+        });
+        const totalTasks = await Task.countDocuments();
+        const completedTasks = await Task.countDocuments({ status: "completed" });
 
 	// total commission income
 	const commissionTransactions = await User.aggregate([
@@ -56,13 +59,13 @@ export const getAdminAnalytics = asyncHandler(async (req, res) => {
 	]);
 	const totalWalletMoney = walletBalances[0]?.total || 0;
 
-	res.json({
-		totalUsers,
-		totalClients,
-		totalWorkers,
-		totalTasks,
-		completedTasks,
-		totalCommission,
+        res.json({
+                totalUsers,
+                totalStandardUsers,
+                totalIdentifiedUsers,
+                totalTasks,
+                completedTasks,
+                totalCommission,
 		totalWalletMoney,
 	});
 });

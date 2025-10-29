@@ -12,13 +12,14 @@ const userSchema = new mongoose.Schema(
 		},
                 role: {
                         type: String,
-                        enum: ["client", "worker", "admin"],
-                        default: "worker",
+                        enum: ["user", "admin"],
+                        default: "user",
                 },
                 avatar: { type: String, default: "" },
                 phone: { type: String, trim: true },
                 passwordHash: { type: String, required: true, select: false },
                 bio: { type: String, default: "" },
+                identification: { type: String, trim: true, default: "" },
 		location: {
 			city: { type: String, trim: true },
 			coordinates: {
@@ -73,6 +74,8 @@ userSchema.methods.toSafeObject = function () {
                 completedTasks,
                 createdAt,
                 preferences,
+                role,
+                identification,
         } = this;
         return {
                 _id,
@@ -86,6 +89,8 @@ userSchema.methods.toSafeObject = function () {
                 completedTasks,
                 createdAt,
                 preferences,
+                role,
+                hasIdentification: Boolean(identification),
         };
 };
 

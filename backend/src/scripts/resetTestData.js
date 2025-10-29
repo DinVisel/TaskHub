@@ -111,9 +111,10 @@ async function seedTestDataset() {
                 {
                         name: "Carla Client",
                         email: "carla.client@example.com",
-                        role: "client",
+                        role: "user",
                         passwordHash,
                         phone: "+1-555-0100",
+                        identification: "ID-CARLA-001",
                         location: {
                                 city: "New York",
                                 coordinates: { lat: 40.7128, lng: -74.006 },
@@ -147,9 +148,10 @@ async function seedTestDataset() {
                 {
                         name: "Jane Worker",
                         email: "jane.worker@example.com",
-                        role: "worker",
+                        role: "user",
                         passwordHash,
                         phone: "+1-555-0115",
+                        identification: "ID-JANE-002",
                         bio: "Full-stack developer helping clients build polished products.",
                         location: {
                                 city: "Brooklyn",
@@ -174,9 +176,10 @@ async function seedTestDataset() {
                 {
                         name: "Noah Worker",
                         email: "noah.worker@example.com",
-                        role: "worker",
+                        role: "user",
                         passwordHash,
                         phone: "+1-555-0128",
+                        identification: "ID-NOAH-003",
                         bio: "Reliable handyman available for evening and weekend jobs.",
                         location: {
                                 city: "Jersey City",

@@ -5,9 +5,15 @@ import AppError from "../utils/appError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const createReview = asyncHandler(async (req, res) => {
-	const { taskId, reviewedUserId, rating, comment } = req.body;
-	if (!taskId || !reviewedUserId || !rating)
-		throw new AppError("taskId,reviewUserId,rating required", 404);
+        const { taskId, reviewedUserId, rating, comment } = req.body;
+        if (!taskId || !reviewedUserId || !rating)
+                throw new AppError("taskId,reviewUserId,rating required", 404);
+
+        if (!req.user.hasIdentification)
+                throw new AppError(
+                        "Identification is required before leaving reviews",
+                        403
+                );
 
 	const task = await Task.findById(taskId);
 	if (!task) throw new AppError("Task not found", 404);

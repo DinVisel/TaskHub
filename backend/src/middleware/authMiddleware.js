@@ -8,15 +8,18 @@ export const protect = async (req, res, next) => {
 	if (!token) return next(new AppError("Not authorized, token missing", 401));
 	try {
 		const decoded = verifyToken(token);
-		const user = await User.findById(decoded.id).select("role");
+                const user = await User.findById(decoded.id).select(
+                        "role identification"
+                );
 		if (!user)
 			return next(new AppError("Not authorized, user no longer exists", 401));
 
-		req.user = {
-			id: user._id.toString(),
-			_id: user._id,
-			role: user.role,
-		};
+                req.user = {
+                        id: user._id.toString(),
+                        _id: user._id,
+                        role: user.role,
+                        hasIdentification: Boolean(user.identification),
+                };
 		next();
 	} catch (error) {
 		next(new AppError("Not authorized, token invalid", 401));

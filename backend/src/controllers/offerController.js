@@ -5,11 +5,18 @@ import AppError from "../utils/appError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const createOffer = asyncHandler(async (req, res) => {
-	const { taskId, message, amount } = req.body;
+        const { taskId, message, amount } = req.body;
 
-	if (req.user.role !== "worker") {
-		throw new AppError("Only workers can apply to tasks", 403);
-	}
+        if (req.user.role !== "user") {
+                throw new AppError("Only standard users can apply to tasks", 403);
+        }
+
+        if (!req.user.hasIdentification) {
+                throw new AppError(
+                        "Identification is required before applying to tasks",
+                        403
+                );
+        }
 
 	if (!taskId) throw new AppError("Task ID is required", 400);
 
@@ -31,10 +38,17 @@ export const createOffer = asyncHandler(async (req, res) => {
 });
 
 export const getOffersForTask = asyncHandler(async (req, res) => {
-	const { taskId } = req.params;
+        const { taskId } = req.params;
 
-	const task = await Task.findById(taskId);
-	if (!task) throw new AppError("Task not found", 404);
+        if (!req.user.hasIdentification) {
+                throw new AppError(
+                        "Identification is required to review offers",
+                        403
+                );
+        }
+
+        const task = await Task.findById(taskId);
+        if (!task) throw new AppError("Task not found", 404);
 
 	if (task.postedBy.toString() !== req.user.id) {
 		throw new AppError(
@@ -52,9 +66,16 @@ export const getOffersForTask = asyncHandler(async (req, res) => {
 });
 
 export const acceptOffer = asyncHandler(async (req, res) => {
-	const { offerId } = req.params;
-	const offer = await Offer.findById(offerId);
-	if (!offer) throw new AppError("Offer not found", 404);
+        const { offerId } = req.params;
+
+        if (!req.user.hasIdentification) {
+                throw new AppError(
+                        "Identification is required to manage offers",
+                        403
+                );
+        }
+        const offer = await Offer.findById(offerId);
+        if (!offer) throw new AppError("Offer not found", 404);
 
 	const task = await Task.findById(offer.taskId);
 	if (!task) throw new AppError("Task not found", 404);
@@ -91,9 +112,16 @@ export const acceptOffer = asyncHandler(async (req, res) => {
 });
 
 export const rejectOffer = asyncHandler(async (req, res) => {
-	const { offerId } = req.params;
-	const offer = await Offer.findById(offerId);
-	if (!offer) throw new AppError("Offer not found", 404);
+        const { offerId } = req.params;
+
+        if (!req.user.hasIdentification) {
+                throw new AppError(
+                        "Identification is required to manage offers",
+                        403
+                );
+        }
+        const offer = await Offer.findById(offerId);
+        if (!offer) throw new AppError("Offer not found", 404);
 
 	const task = await Task.findById(offer.taskId);
 	if (!task) throw new AppError("Task not found", 404);
