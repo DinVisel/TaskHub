@@ -182,9 +182,9 @@ export default function Home() {
 		router.push("/(tabs)/account");
 	};
 
-	const handleTaskPress = useCallback((taskId) => {
-		router.push(`/chat/${taskId}`);
-	}, []);
+        const handleTaskPress = useCallback((taskId) => {
+                router.push(`/tasks/${taskId}`);
+        }, []);
 
 	const keyExtractor = useCallback((item) => item._id, []);
 
