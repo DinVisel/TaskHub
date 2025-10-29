@@ -9,9 +9,9 @@ import {
 
 const router = Router();
 
-router.post("/", protect, restrictTo("worker"), createOffer);
-router.get("/:taskId", protect, restrictTo("client"), getOffersForTask);
-router.put("/:offerId/accept", protect, restrictTo("client"), acceptOffer);
-router.put("/:offerId/reject", protect, restrictTo("client"), rejectOffer);
+router.post("/", protect, restrictTo("user"), createOffer);
+router.get("/:taskId", protect, restrictTo("user"), getOffersForTask);
+router.put("/:offerId/accept", protect, restrictTo("user"), acceptOffer);
+router.put("/:offerId/reject", protect, restrictTo("user"), rejectOffer);
 
 export default router;

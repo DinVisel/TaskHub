@@ -40,7 +40,7 @@ function registerOrLogin(email, name) {
     name,
     email,
     password: PASSWORD,
-    role: "client",
+    role: "user",
   });
 
   const res = http.post(`${BASE_URL}/api/auth/register`, payload, jsonHeaders());
@@ -70,6 +70,18 @@ function registerOrLogin(email, name) {
   return null;
 }
 
+function ensureIdentification(token, id) {
+  const payload = JSON.stringify({ identification: `LOADTEST-${id}` });
+  const res = http.patch(
+    `${BASE_URL}/api/users/me`,
+    payload,
+    jsonHeaders(token),
+  );
+  check(res, {
+    "identification updated": (r) => r.status === 200,
+  }) || errorRate.add(1);
+}
+
 export default function () {
   const id = uniqueUserId();
   const email = `loadtest+${id}@example.com`;
@@ -80,6 +92,8 @@ export default function () {
     if (!token) {
       return;
     }
+
+    ensureIdentification(token, id);
 
     group("create task", () => {
       const taskBody = JSON.stringify({

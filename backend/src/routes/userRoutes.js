@@ -13,9 +13,9 @@ import {
 
 const router = Router();
 
-router.get("/my-tasks", protect, restrictTo("client"), getMyTasks);
-router.get("/my-offers", protect, restrictTo("worker"), getMyOffers);
-router.get("/my-jobs", protect, restrictTo("worker"), getMyJobs);
+router.get("/my-tasks", protect, restrictTo("user"), getMyTasks);
+router.get("/my-offers", protect, restrictTo("user"), getMyOffers);
+router.get("/my-jobs", protect, restrictTo("user"), getMyJobs);
 router.get("/stats", protect, getUserStats);
 router.get("/preferences", protect, getPreferences);
 router.patch("/preferences", protect, updatePreferences);
