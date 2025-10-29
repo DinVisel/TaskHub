@@ -15,6 +15,7 @@ import { router } from "expo-router";
 
 import api from "../api/api";
 import { AuthContext } from "../context/AuthContext";
+import * as ImagePicker from "expo-image-picker";
 import { colors, spacing, fonts, radii, shadow } from "../theme";
 
 const PLACEHOLDER_AVATAR = "https://i.pravatar.cc/200";
@@ -26,10 +27,22 @@ export default function EditProfile() {
 	const [phone, setPhone] = useState("");
 	const [bio, setBio] = useState("");
 	const [city, setCity] = useState("");
-	const [avatar, setAvatar] = useState("");
+	const [avatar, setAvatar] = useState(null);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState("");
 	const [success, setSuccess] = useState("");
+
+	const pickImage = async () => {
+		const result = await ImagePicker.launchImageLibraryAsync({
+			mediaTypes: ImagePicker.MediaTypeOptions.Images,
+			allowsEditing: true,
+			quality: 0.8,
+		});
+
+		if (!result.canceled && result.assets?.length) {
+			setAvatar(result.assets[0].uri);
+		}
+	};
 
 	useEffect(() => {
 		if (!user) return;
@@ -96,18 +109,9 @@ export default function EditProfile() {
 				<View style={styles.card}>
 					<View style={styles.avatarPreview}>
 						<Image source={{ uri: previewSource }} style={styles.avatarImage} />
-						<Text style={styles.label}>Profile photo URL</Text>
-						<TextInput
-							placeholder='https://example.com/you.jpg'
-							placeholderTextColor={colors.subtext}
-							style={styles.input}
-							autoCapitalize='none'
-							value={avatar}
-							onChangeText={setAvatar}
-						/>
-						<Text style={styles.helper}>
-							Paste a link to a square image. Leave blank to use the default avatar.
-						</Text>
+						<TouchableOpacity onPress={pickImage}>
+							<Text>Pick Avatar</Text>
+						</TouchableOpacity>
 					</View>
 
 					<View style={styles.fieldGroup}>

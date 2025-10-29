@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
 		flexGrow: 1,
 		backgroundColor: colors.background,
 		alignItems: "center",
-		paddingBottom: spacing.xl,
+		paddingBottom: 90,
 	},
 	header: {
 		width: "100%",
