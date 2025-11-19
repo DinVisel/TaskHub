@@ -164,12 +164,6 @@ export default function Home() {
 		}
 	};
 
-	const condensedHeaderOpacity = scrollY.interpolate({
-		inputRange: [80, 140],
-		outputRange: [0, 1],
-		extrapolate: "clamp",
-	});
-
 	const handlePostTask = () => {
 		router.push("/(tabs)/post-task");
 	};
@@ -182,9 +176,9 @@ export default function Home() {
 		router.push("/(tabs)/account");
 	};
 
-        const handleTaskPress = useCallback((taskId) => {
-                router.push(`/tasks/${taskId}`);
-        }, []);
+	const handleTaskPress = useCallback((taskId) => {
+		router.push(`/tasks/${taskId}`);
+	}, []);
 
 	const keyExtractor = useCallback((item) => item._id, []);
 

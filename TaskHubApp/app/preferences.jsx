@@ -69,7 +69,7 @@ export default function Preferences() {
 			>
 				<Text style={styles.headerTitle}>Match Preferences</Text>
 				<Text style={styles.headerSubtitle}>
-					Choose the jobs you love and how far you're willing to travel.
+					Choose the jobs you love and how far you&apos;re willing to travel.
 				</Text>
 			</LinearGradient>
 
@@ -95,7 +95,7 @@ export default function Preferences() {
 					/>
 
 					<Text style={styles.helper}>
-						Separate categories with commas. We'll prioritise matches in these areas
+						Separate categories with commas. We&apos;ll prioritise matches in these areas
 						first.
 					</Text>
 

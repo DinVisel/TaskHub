@@ -34,7 +34,7 @@ const formatCurrency = (amount, currency = "USD") => {
                         currency,
                         maximumFractionDigits: 0,
                 }).format(amount);
-        } catch (e) {
+        } catch {
                 return `${amount} ${currency}`;
         }
 };
@@ -109,8 +109,8 @@ export default function TaskDetail() {
                 const amount = Number.isFinite(budgetAmount)
                         ? budgetAmount
                         : Number.isFinite(priceAmount)
-                        ? priceAmount
-                        : null;
+                                ? priceAmount
+                                : null;
 
                 const currency =
                         task?.budget?.currency ||
@@ -135,7 +135,7 @@ export default function TaskDetail() {
                 if (!task?.createdAt) return null;
                 try {
                         return new Date(task.createdAt).toLocaleString();
-                } catch (e) {
+                } catch {
                         return null;
                 }
         }, [task?.createdAt]);

@@ -126,6 +126,11 @@ io.on("connection", (socket) => {
 });
 
 const PORT = process.env.PORT || 4000;
-connectDB().then(() => {
-	server.listen(PORT, () => console.log(`API + WS on http://localhost:${PORT}`));
-});
+
+if (process.env.NODE_ENV !== "test") {
+	connectDB().then(() => {
+		server.listen(PORT, () => console.log(`API + WS on http://localhost:${PORT}`));
+	});
+}
+
+export default app;

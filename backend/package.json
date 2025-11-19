@@ -6,7 +6,7 @@
 	"scripts": {
                 "dev": "nodemon src/server.js",
                 "start": "node src/server.js",
-                "test": "jest --detectOpenHandles --forceExit",
+                "test": "NODE_OPTIONS=--experimental-vm-modules NODE_ENV=test jest --detectOpenHandles --forceExit",
                 "seed:test": "node src/scripts/resetTestData.js"
 	},
 	"keywords": [],

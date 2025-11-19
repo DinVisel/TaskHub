@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { Stack } from "expo-router";
 import { AuthProvider, AuthContext } from "../context/AuthContext";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+// import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 function AuthenticatedStack() {
 	const { user, loading } = useContext(AuthContext);
