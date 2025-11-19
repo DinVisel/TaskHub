@@ -12,8 +12,8 @@ const userSchema = new mongoose.Schema(
 		},
                 role: {
                         type: String,
-                        enum: ["user", "admin"],
-                        default: "user",
+                        enum: ["USER", "VERIFIED_USER", "PRO_USER", "FLAGGED_USER", "ADMIN"],
+                        default: "USER",
                 },
                 avatar: { type: String, default: "" },
                 phone: { type: String, trim: true },

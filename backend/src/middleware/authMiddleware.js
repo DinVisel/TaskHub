@@ -26,18 +26,9 @@ export const protect = async (req, res, next) => {
 	}
 };
 
-export const restrictTo =
-	(...allowedRoles) =>
-	(req, res, next) => {
-		if (allowedRoles.length && !allowedRoles.includes(req.user.role)) {
-			return next(new AppError("Not authorized for this action", 403));
-		}
-		next();
-	};
-
-export const adminOnly = (req, res, next) => {
-	if (!req.user || req.user.role !== "admin") {
-		return res.status(403).json({ message: "Admin access only" });
+export const requireRole = (allowedRoles) => (req, res, next) => {
+	if (!req.user || !allowedRoles.includes(req.user.role)) {
+		return next(new AppError("Not authorized for this action", 403));
 	}
 	next();
 };

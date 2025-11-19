@@ -59,13 +59,45 @@ export const getAdminAnalytics = asyncHandler(async (req, res) => {
 	]);
 	const totalWalletMoney = walletBalances[0]?.total || 0;
 
-        res.json({
-                totalUsers,
-                totalStandardUsers,
-                totalIdentifiedUsers,
-                totalTasks,
-                completedTasks,
-                totalCommission,
+	res.json({
+		totalUsers,
+		totalStandardUsers,
+		totalIdentifiedUsers,
+		totalTasks,
+		completedTasks,
+		totalCommission,
 		totalWalletMoney,
+	});
+});
+
+export const updateUserRole = asyncHandler(async (req, res) => {
+	const { role } = req.body;
+	const validRoles = [
+		"USER",
+		"VERIFIED_USER",
+		"PRO_USER",
+		"FLAGGED_USER",
+		"ADMIN",
+	];
+
+	if (!validRoles.includes(role)) {
+		res.status(400);
+		throw new Error("Invalid role");
+	}
+
+	const user = await User.findByIdAndUpdate(
+		req.params.id,
+		{ role },
+		{ new: true }
+	);
+
+	if (!user) {
+		res.status(404);
+		throw new Error("User not found");
+	}
+
+	res.json({
+		message: "User role updated",
+		user: user.toSafeObject(),
 	});
 });

@@ -4,15 +4,6 @@ import AppError from "../utils/appError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const createTask = asyncHandler(async (req, res) => {
-        if (req.user.role !== "user")
-                throw new AppError("Only standard users can create tasks", 403);
-
-        if (!req.user.hasIdentification)
-                throw new AppError(
-                        "Identification is required before creating tasks",
-                        403
-                );
-
 	const { title, description, category, price, location, budget } = req.body;
 	if (!title || !description)
 		throw new AppError("Title and description are required", 400);

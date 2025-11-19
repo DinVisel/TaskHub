@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { protect, restrictTo } from "../middleware/authMiddleware.js";
+import { protect } from "../middleware/authMiddleware.js";
 import {
         getProfile,
         getMyJobs,
@@ -13,9 +13,9 @@ import {
 
 const router = Router();
 
-router.get("/my-tasks", protect, restrictTo("user"), getMyTasks);
-router.get("/my-offers", protect, restrictTo("user"), getMyOffers);
-router.get("/my-jobs", protect, restrictTo("user"), getMyJobs);
+router.get("/my-tasks", protect, getMyTasks);
+router.get("/my-offers", protect, getMyOffers);
+router.get("/my-jobs", protect, getMyJobs);
 router.get("/stats", protect, getUserStats);
 router.get("/preferences", protect, getPreferences);
 router.patch("/preferences", protect, updatePreferences);

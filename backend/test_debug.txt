@@ -1,0 +1,53 @@
+
+> backend@1.0.0 test
+> NODE_OPTIONS=--experimental-vm-modules NODE_ENV=test jest --detectOpenHandles --forceExit __tests__/roles.test.js
+
+(node:56395) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+  console.log
+    MongoDB connected: ac-nxefq6a-shard-00-01.gbjpd2l.mongodb.net
+
+      at log (src/config/db.js:8:11)
+
+  console.log
+    Creating task with body: {
+      title: 'Test Task',
+      description: 'Desc',
+      category: 'General',
+      price: 100,
+      location: { address: 'Test' }
+    }
+
+      at log (src/controllers/taskController.js:7:10)
+
+FAIL __tests__/roles.test.js
+  Role System Verification
+    Task Posting Permissions
+      ✓ should deny USER from posting a task (86 ms)
+      ✕ should allow VERIFIED_USER to post a task (67 ms)
+    Admin Role Management
+      ✓ should deny non-admin from updating roles (62 ms)
+      ✓ should allow ADMIN to update user role (180 ms)
+
+  ● Role System Verification › Task Posting Permissions › should allow VERIFIED_USER to post a task
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+      74 | 					location: { address: "Test" },
+      75 | 				});
+    > 76 | 			expect(res.statusCode).toBe(201);
+         | 			                       ^
+      77 | 		});
+      78 | 	});
+      79 |
+
+      at Object.toBe (__tests__/roles.test.js:76:27)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 3 passed, 4 total
+Snapshots:   0 total
+Time:        2.435 s, estimated 3 s
+Ran all test suites matching __tests__/roles.test.js.
