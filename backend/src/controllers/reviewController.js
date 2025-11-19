@@ -3,6 +3,7 @@ import Task from "../models/Task.js";
 import User from "../models/User.js";
 import AppError from "../utils/appError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { updateTrustScore } from "../services/trustScoreService.js";
 
 export const createReview = asyncHandler(async (req, res) => {
         const { taskId, reviewedUserId, rating, comment } = req.body;
@@ -45,6 +46,15 @@ export const createReview = asyncHandler(async (req, res) => {
                         rating: Number(stats[0].avgRating.toFixed(1)),
                 });
         }
+
+	// Trust Score Update: +5 for high rating
+	if (rating >= 4) {
+		await updateTrustScore(
+			reviewedUserId,
+			5,
+			`High rating (${rating}) received`
+		);
+	}
 
 	res.status(201).json({ review });
 });

@@ -2,6 +2,7 @@ import Task from "../models/Task.js";
 import User from "../models/User.js";
 import AppError from "../utils/appError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { updateTrustScore } from "../services/trustScoreService.js";
 
 export const createTask = asyncHandler(async (req, res) => {
 	const { title, description, category, price, location, budget } = req.body;
@@ -104,6 +105,18 @@ export const completeTask = asyncHandler(async (req, res) => {
 	task.completedBy = userId;
 	task.completedAt = new Date();
 	await task.save();
+
+	// Trust Score Updates: +10 for completing a task
+	await updateTrustScore(
+		task.postedBy,
+		10,
+		`Task completed: ${task.title}`
+	);
+	await updateTrustScore(
+		task.assignedTo,
+		10,
+		`Task completed: ${task.title}`
+	);
 
 	res.json({ message: "Task marked as completed", task });
 });

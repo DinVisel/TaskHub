@@ -16,6 +16,8 @@ const userSchema = new mongoose.Schema(
                         default: "USER",
                 },
                 avatar: { type: String, default: "" },
+                trustScore: { type: Number, default: 50 },
+                lastIp: { type: String, select: false },
                 phone: { type: String, trim: true },
                 passwordHash: { type: String, required: true, select: false },
                 bio: { type: String, default: "" },
@@ -75,6 +77,7 @@ userSchema.methods.toSafeObject = function () {
                 createdAt,
                 preferences,
                 role,
+                trustScore,
                 identification,
         } = this;
         return {
@@ -90,6 +93,7 @@ userSchema.methods.toSafeObject = function () {
                 createdAt,
                 preferences,
                 role,
+                trustScore,
                 hasIdentification: Boolean(identification),
         };
 };

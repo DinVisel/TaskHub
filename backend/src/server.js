@@ -21,7 +21,7 @@ import { verifyToken } from "./utils/jwt.js";
 import Task from "./models/Task.js";
 import Offer from "./models/Offer.js";
 import Message from "./models/Message.js";
-
+import reportRoutes from "./routes/reportRoutes.js";
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -33,6 +33,7 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/offers", offerRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/reports", reportRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/wallet", walletRoutes);
 app.use("/api/match", matchRoutes);

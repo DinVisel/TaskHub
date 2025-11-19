@@ -3,6 +3,7 @@ import User from "../models/User.js";
 import AppError from "../utils/appError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { signToken } from "../utils/jwt.js";
+import { updateTrustScore } from "../services/trustScoreService.js";
 
 export const register = asyncHandler(async (req, res) => {
         const { name, email, password, phone, role } = req.body;
@@ -24,7 +25,18 @@ export const register = asyncHandler(async (req, res) => {
                 phone,
                 passwordHash,
                 role: userRole,
+		lastIp: req.ip,
         });
+
+	// Check for multiple accounts from same IP
+	const ipCount = await User.countDocuments({ lastIp: req.ip });
+	if (ipCount > 3) {
+		await updateTrustScore(
+			user._id,
+			-15,
+			"Multiple accounts from same IP"
+		);
+	}
 	const token = signToken({ id: user._id });
 
 	res.status(201).json({ token, user: user.toSafeObject() });
