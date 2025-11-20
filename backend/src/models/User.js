@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema(
                 avatar: { type: String, default: "" },
                 trustScore: { type: Number, default: 50 },
                 lastIp: { type: String, select: false },
+                deviceId: { type: String, select: false },
                 phone: { type: String, trim: true },
                 passwordHash: { type: String, required: true, select: false },
                 bio: { type: String, default: "" },
