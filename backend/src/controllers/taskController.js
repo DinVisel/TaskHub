@@ -27,6 +27,7 @@ export const createTask = asyncHandler(async (req, res) => {
 		budget: numericBudget ?? numericPrice ?? 0,
 		location,
 		postedBy: req.user.id,
+		requiresAdminApproval: req.flaggedUserPost || false,
 	});
 
 	res.status(201).json({ task });
@@ -124,6 +125,11 @@ export const completeTask = asyncHandler(async (req, res) => {
 export const getFilteredTasks = asyncHandler(async (req, res) => {
 	const { search, category, city } = req.query;
 	const query = { status: "open" };
+
+	// Hide tasks requiring admin approval unless user is admin
+	if (!req.user || req.user.role !== "ADMIN") {
+		query.requiresAdminApproval = { $ne: true };
+	}
 
 	if (search) {
 		query.$or = [

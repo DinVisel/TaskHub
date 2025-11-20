@@ -41,6 +41,10 @@ const taskSchema = new mongoose.Schema(
 		completedAt: {
 			type: Date,
 		},
+		requiresAdminApproval: {
+			type: Boolean,
+			default: false,
+		},
 		paid: { type: Boolean, default: false },
 		commissionRate: { type: Number, default: 0.1 },
 	},

@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { protect, requireRole } from "../middleware/authMiddleware.js";
-import { detectRapidJobPosting } from "../middleware/suspiciousBehavior.js";
+import { protect } from "../middleware/authMiddleware.js";
+import { checkJobPostingPermission } from "../middleware/jobPostingControl.js";
 import {
 	createTask,
 	getTask,
@@ -12,7 +12,7 @@ const router = Router();
 
 router
 	.route("/")
-	.post(protect, requireRole(["VERIFIED_USER", "PRO_USER", "ADMIN"]), detectRapidJobPosting, createTask)
+	.post(protect, checkJobPostingPermission, createTask)
 	.get(getFilteredTasks);
 router.put(
 	"/:id/complete",
