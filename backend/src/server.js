@@ -23,10 +23,17 @@ import Offer from "./models/Offer.js";
 import Message from "./models/Message.js";
 import reportRoutes from "./routes/reportRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import { globalLimiter } from "./middleware/rateLimiter.js";
+
 const app = express();
+
+// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Apply global rate limiting
+app.use("/api", globalLimiter);
 
 // REST routes
 app.get("/api/health", (req, res) => res.json({ ok: true }));

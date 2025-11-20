@@ -63,7 +63,11 @@ const userSchema = new mongoose.Schema(
 				},
 			},
 		],
-	profileCompleted: { type: Boolean, default: false },
+		profileCompleted: { type: Boolean, default: false },
+		isVerified: { type: Boolean, default: false },
+		verificationToken: { type: String, select: false },
+		resetPasswordToken: { type: String, select: false },
+		resetPasswordExpires: { type: Date, select: false },
 	},
 	{ timestamps: true }
 );

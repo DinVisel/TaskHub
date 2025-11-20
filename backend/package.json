@@ -20,11 +20,13 @@
 		"dotenv": "^17.2.3",
 		"expo-server-sdk": "^4.0.0",
 		"express": "^5.1.0",
+		"express-rate-limit": "^8.2.1",
 		"geolib": "^3.3.4",
 		"jsonwebtoken": "^9.0.2",
 		"k6": "^0.0.0",
 		"mongodb": "^6.20.0",
 		"mongoose": "^8.19.1",
+		"nodemailer": "^7.0.10",
 		"socket.io": "^4.8.1"
 	},
 	"devDependencies": {
