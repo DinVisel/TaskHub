@@ -2,6 +2,8 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import User from "../models/User.js";
 import Task from "../models/Task.js";
 import Review from "../models/Review.js";
+import SecurityLog from "../models/SecurityLog.js";
+import { updateTrustScore } from "../services/trustScoreService.js";
 
 // GET /api/admin/users
 export const getAllUsers = asyncHandler(async (req, res) => {
@@ -99,5 +101,109 @@ export const updateUserRole = asyncHandler(async (req, res) => {
 	res.json({
 		message: "User role updated",
 		user: user.toSafeObject(),
+	});
+});
+
+// GET /api/admin/security/flagged-users
+export const getFlaggedUsers = asyncHandler(async (req, res) => {
+	const flaggedUsers = await User.find({ role: "FLAGGED_USER" })
+		.select("name email role trustScore createdAt lastIp deviceId")
+		.sort({ createdAt: -1 });
+
+	res.json({
+		count: flaggedUsers.length,
+		users: flaggedUsers,
+	});
+});
+
+// GET /api/admin/security/risky-jobs
+export const getRiskyJobs = asyncHandler(async (req, res) => {
+	const riskyJobs = await Task.find({ requiresAdminApproval: true })
+		.populate("postedBy", "name email role trustScore")
+		.sort({ createdAt: -1 });
+
+	res.json({
+		count: riskyJobs.length,
+		jobs: riskyJobs,
+	});
+});
+
+// GET /api/admin/security/logs
+export const getSecurityLogs = asyncHandler(async (req, res) => {
+	const { type, userId, limit = 50, skip = 0 } = req.query;
+
+	const query = {};
+	if (type) query.actionType = type;
+	if (userId) query.userId = userId;
+
+	const logs = await SecurityLog.find(query)
+		.populate("userId", "name email role")
+		.sort({ createdAt: -1 })
+		.limit(parseInt(limit))
+		.skip(parseInt(skip));
+
+	const total = await SecurityLog.countDocuments(query);
+
+	res.json({
+		logs,
+		total,
+		count: logs.length,
+		limit: parseInt(limit),
+		skip: parseInt(skip),
+	});
+});
+
+// PATCH /api/admin/users/:id/trust-score
+export const adjustTrustScore = asyncHandler(async (req, res) => {
+	const { adjustment, reason } = req.body;
+
+	if (typeof adjustment !== "number") {
+		res.status(400);
+		throw new Error("Adjustment must be a number");
+	}
+
+	const user = await User.findById(req.params.id);
+	if (!user) {
+		res.status(404);
+		throw new Error("User not found");
+	}
+
+	await updateTrustScore(
+		user._id,
+		adjustment,
+		reason || "Admin manual adjustment"
+	);
+
+	const updatedUser = await User.findById(user._id);
+
+	res.json({
+		message: "Trust score adjusted",
+		user: {
+			id: updatedUser._id,
+			name: updatedUser.name,
+			email: updatedUser.email,
+			trustScore: updatedUser.trustScore,
+		},
+		adjustment,
+		reason,
+	});
+});
+
+// PATCH /api/admin/tasks/:id/approve
+export const approveJob = asyncHandler(async (req, res) => {
+	const task = await Task.findByIdAndUpdate(
+		req.params.id,
+		{ requiresAdminApproval: false },
+		{ new: true }
+	).populate("postedBy", "name email");
+
+	if (!task) {
+		res.status(404);
+		throw new Error("Task not found");
+	}
+
+	res.json({
+		message: "Job approved",
+		task,
 	});
 });
