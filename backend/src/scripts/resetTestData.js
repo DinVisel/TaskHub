@@ -111,7 +111,7 @@ async function seedTestDataset() {
                 {
                         name: "Carla Client",
                         email: "carla.client@example.com",
-                        role: "user",
+                        role: "USER",
                         passwordHash,
                         phone: "+1-555-0100",
                         identification: "ID-CARLA-001",
@@ -148,7 +148,7 @@ async function seedTestDataset() {
                 {
                         name: "Jane Worker",
                         email: "jane.worker@example.com",
-                        role: "user",
+                        role: "USER",
                         passwordHash,
                         phone: "+1-555-0115",
                         identification: "ID-JANE-002",
@@ -176,7 +176,7 @@ async function seedTestDataset() {
                 {
                         name: "Noah Worker",
                         email: "noah.worker@example.com",
-                        role: "user",
+                        role: "USER",
                         passwordHash,
                         phone: "+1-555-0128",
                         identification: "ID-NOAH-003",
@@ -210,7 +210,7 @@ async function seedTestDataset() {
                 {
                         name: "Amelia Admin",
                         email: "amelia.admin@example.com",
-                        role: "admin",
+                        role: "ADMIN",
                         passwordHash,
                         phone: "+1-555-0199",
                         location: {

@@ -145,7 +145,7 @@ export default function Account() {
 							<Text style={styles.actionText}>💬 Messages</Text>
 						</TouchableOpacity>
 
-						{user?.role === "admin" && (
+						{user?.role === "ADMIN" && (
 							<TouchableOpacity
 								style={[styles.actionButton, styles.adminButton]}
 								onPress={() => router.push("/admin-panel")}
