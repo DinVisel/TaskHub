@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { protect } from "../middleware/authMiddleware.js";
 import { checkJobPostingPermission } from "../middleware/jobPostingControl.js";
+import { detectRiskyJob } from "../middleware/jobRiskDetection.js";
 import {
 	createTask,
 	getTask,
@@ -12,7 +13,7 @@ const router = Router();
 
 router
 	.route("/")
-	.post(protect, checkJobPostingPermission, createTask)
+	.post(protect, checkJobPostingPermission, detectRiskyJob, createTask)
 	.get(getFilteredTasks);
 router.put(
 	"/:id/complete",

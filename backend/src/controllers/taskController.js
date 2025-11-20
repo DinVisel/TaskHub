@@ -27,7 +27,7 @@ export const createTask = asyncHandler(async (req, res) => {
 		budget: numericBudget ?? numericPrice ?? 0,
 		location,
 		postedBy: req.user.id,
-		requiresAdminApproval: req.flaggedUserPost || false,
+		requiresAdminApproval: req.flaggedUserPost || req.riskyJob || false,
 	});
 
 	res.status(201).json({ task });
