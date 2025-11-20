@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { protect } from "../middleware/authMiddleware.js";
+import { protect,requireRole } from "../middleware/authMiddleware.js";
 import { checkJobPostingPermission } from "../middleware/jobPostingControl.js";
 import { detectRiskyJob } from "../middleware/jobRiskDetection.js";
 import { requireCompleteProfile } from "../middleware/profileCompleteness.js";
