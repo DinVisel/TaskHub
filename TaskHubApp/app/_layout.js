@@ -26,10 +26,14 @@ function AuthenticatedStack() {
         );
 }
 
+import { NotificationProvider } from "../context/NotificationContext";
+
 export default function RootLayout() {
 	return (
-		<AuthProvider>
-			<AuthenticatedStack />
-		</AuthProvider>
+		<NotificationProvider>
+			<AuthProvider>
+				<AuthenticatedStack />
+			</AuthProvider>
+		</NotificationProvider>
 	);
 }

@@ -22,9 +22,11 @@ import Task from "./models/Task.js";
 import Offer from "./models/Offer.js";
 import Message from "./models/Message.js";
 import reportRoutes from "./routes/reportRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // REST routes
 app.get("/api/health", (req, res) => res.json({ ok: true }));
@@ -35,6 +37,7 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/notifications", notificationRoutes);
 app.use("/api/wallet", walletRoutes);
 app.use("/api/match", matchRoutes);
 app.use("/api/users", userRoutes);

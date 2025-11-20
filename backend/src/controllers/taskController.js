@@ -46,6 +46,10 @@ export const getTask = asyncHandler(async (req, res) => {
         res.json({ task });
 });
 
+import { createNotification } from "../services/notificationService.js";
+
+// ... existing imports
+
 export const completeTask = asyncHandler(async (req, res) => {
 	const { id } = req.params; // task id
 	const userId = req.user.id;
@@ -89,6 +93,15 @@ export const completeTask = asyncHandler(async (req, res) => {
 
 		await worker.save();
 		await client.save();
+
+		// Notify worker about payment
+		await createNotification(
+			worker._id,
+			"PAYMENT_RECEIVED",
+			"Payment Received",
+			`You received $${payout.toFixed(2)} for completing "${task.title}"`,
+			{ taskId: task._id }
+		);
 	}
 
 	// must be owner or assigned worker
@@ -118,6 +131,18 @@ export const completeTask = asyncHandler(async (req, res) => {
 		10,
 		`Task completed: ${task.title}`
 	);
+
+	// Notify the other party
+	const notifyTarget = isOwner ? task.assignedTo : task.postedBy;
+	if (notifyTarget) {
+		await createNotification(
+			notifyTarget,
+			"TASK_COMPLETED",
+			"Task Completed",
+			`"${task.title}" has been marked as completed.`,
+			{ taskId: task._id }
+		);
+	}
 
 	res.json({ message: "Task marked as completed", task });
 });

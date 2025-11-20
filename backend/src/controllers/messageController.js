@@ -42,18 +42,22 @@ export const getTaskMessages = asyncHandler(async (req, res) => {
 	res.json({ messages });
 });
 
+import { createNotification } from "../services/notificationService.js";
+
+// ... existing imports
+
 // POST /api/messages  -> send via REST (fallback/testing)
 export const sendMessageREST = asyncHandler(async (req, res) => {
-        const { taskId, receiverId, content } = req.body;
-        if (!taskId || !receiverId || !content) {
-                throw new AppError("taskId, receiverId, content are required", 400);
-        }
+	const { taskId, receiverId, content } = req.body;
+	if (!taskId || !receiverId || !content) {
+		throw new AppError("taskId, receiverId, content are required", 400);
+	}
 
-        if (!req.user.hasIdentification)
-                throw new AppError(
-                        "Identification is required before sending messages",
-                        403
-                );
+	if (!req.user.hasIdentification)
+		throw new AppError(
+			"Identification is required before sending messages",
+			403
+		);
 
 	const { ok, reason } = await canChat(req.user.id, taskId);
 	if (!ok) throw new AppError(reason, 403);
@@ -64,6 +68,15 @@ export const sendMessageREST = asyncHandler(async (req, res) => {
 		receiverId,
 		content,
 	});
+
+	// Notify receiver
+	await createNotification(
+		receiverId,
+		"MESSAGE",
+		`New message from ${req.user.name}`,
+		content.substring(0, 50) + (content.length > 50 ? "..." : ""),
+		{ taskId, messageId: msg._id }
+	);
 
 	res.status(201).json({ message: msg });
 });

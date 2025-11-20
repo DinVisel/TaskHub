@@ -1,7 +1,32 @@
 import React from "react";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { Platform } from "react-native";
+import { Platform, View, Text } from "react-native";
+import { useNotifications } from "../../context/NotificationContext";
+
+const NotificationBadge = () => {
+	const { unreadCount } = useNotifications();
+	if (unreadCount === 0) return null;
+	return (
+		<View
+			style={{
+				position: "absolute",
+				right: -6,
+				top: -3,
+				backgroundColor: "red",
+				borderRadius: 10,
+				width: 20,
+				height: 20,
+				justifyContent: "center",
+				alignItems: "center",
+			}}
+		>
+			<Text style={{ color: "white", fontSize: 12, fontWeight: "bold" }}>
+				{unreadCount > 99 ? "99+" : unreadCount}
+			</Text>
+		</View>
+	);
+};
 
 export default function Layout() {
 	return (
@@ -53,6 +78,22 @@ export default function Layout() {
 							size={30}
 							color={focused ? "#007bff" : "#999"}
 						/>
+					),
+				}}
+			/>
+
+			<Tabs.Screen
+				name='notifications'
+				options={{
+					tabBarIcon: ({ focused }) => (
+						<View>
+							<Ionicons
+								name={focused ? "notifications" : "notifications-outline"}
+								size={30}
+								color={focused ? "#007bff" : "#999"}
+							/>
+							<NotificationBadge />
+						</View>
 					),
 				}}
 			/>

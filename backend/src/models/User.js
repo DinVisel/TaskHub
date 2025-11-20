@@ -34,14 +34,17 @@ const userSchema = new mongoose.Schema(
 		rating: { type: Number, default: 0 },
 		completedTasks: { type: Number, default: 0 },
 		preferences: {
-			categories: {
-				type: [String],
-				default: [],
-			},
-			radiusKm: {
-				type: Number,
-				default: 25,
-			},
+			categories: [String],
+			radiusKm: { type: Number, default: 50 },
+			notifications: { type: Boolean, default: true },
+		},
+		pushToken: {
+			type: String,
+			default: null,
+		},
+		trustScore: {
+			type: Number,
+			default: 100,
 		},
 		walletBalance: {
 			type: Number,

@@ -32,17 +32,16 @@ export const deleteTask = asyncHandler(async (req, res) => {
 // GET /api/admin/reviews
 export const getAllReviews = asyncHandler(async (req, res) => {
 	const reviews = await Review.find()
-		.populate("reviewer", "name")
-		.populate("reviewee", "name");
+		.populate("reviewerId", "name")
+		.populate("reviewedUserId", "name");
 	res.json(reviews);
 });
 
 export const getAdminAnalytics = asyncHandler(async (req, res) => {
         const totalUsers = await User.countDocuments();
-        const totalStandardUsers = await User.countDocuments({ role: "user" });
+        const totalStandardUsers = await User.countDocuments({ role: "USER" });
         const totalIdentifiedUsers = await User.countDocuments({
-                role: "user",
-                identification: { $ne: "" },
+                role: "VERIFIED_USER",
         });
         const totalTasks = await Task.countDocuments();
         const completedTasks = await Task.countDocuments({ status: "completed" });
