@@ -177,3 +177,39 @@ export const getFilteredTasks = asyncHandler(async (req, res) => {
 
 	res.status(200).json({ tasks });
 });
+
+export const updateTask = asyncHandler(async (req, res) => {
+	const { id } = req.params;
+	const userId = req.user.id;
+
+	let task = await Task.findById(id);
+	if (!task) throw new AppError("Task not found", 404);
+
+	if (task.postedBy.toString() !== userId) {
+		throw new AppError("Not authorized to update this task", 403);
+	}
+
+	// Allow updating specific fields
+	const allowedUpdates = [
+		"title",
+		"description",
+		"category",
+		"price",
+		"budget",
+		"location",
+		"image",
+	];
+	const updates = Object.keys(req.body);
+	const isValidOperation = updates.every((update) =>
+		allowedUpdates.includes(update)
+	);
+
+	if (!isValidOperation) {
+		throw new AppError("Invalid updates!", 400);
+	}
+
+	updates.forEach((update) => (task[update] = req.body[update]));
+	await task.save();
+
+	res.json({ task });
+});

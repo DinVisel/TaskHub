@@ -8,6 +8,7 @@ import {
 	getTask,
 	completeTask,
 	getFilteredTasks,
+	updateTask,
 } from "../controllers/taskController.js";
 
 const router = Router();
@@ -23,6 +24,6 @@ router.put(
 	completeTask
 );
 
-router.route("/:id").get(getTask);
+router.route("/:id").get(getTask).patch(protect, updateTask);
 
 export default router;

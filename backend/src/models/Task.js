@@ -9,6 +9,7 @@ const taskSchema = new mongoose.Schema(
 			enum: ["Cleaning", "Repair", "Programming", "Tutoring", "Delivery", "Other"],
 			default: "Other",
 		},
+		image: { type: String },
 		price: { type: Number, default: 0 },
 		budget: Number,
 		status: {

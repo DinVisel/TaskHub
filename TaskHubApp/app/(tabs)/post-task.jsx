@@ -31,21 +31,6 @@ export default function PostTask() {
 			setSubmitting(true);
 			setMessage("");
 
-			let imageUrl = image;
-			if (image) {
-				const formData = new FormData();
-				formData.append("file", {
-					uri: image,
-					name: "task-image.jpg",
-					type: "image/jpeg",
-				});
-
-				const uploadRes = await api.post("/upload", formData, {
-					headers: { "Content-Type": "multipart/form-data" },
-				});
-				imageUrl = uploadRes.data.url;
-			}
-
 			const trimmedCity = city.trim();
 			const locationData = {};
 
@@ -57,18 +42,49 @@ export default function PostTask() {
 				locationData.coordinates = { ...coords };
 			}
 
+			// 1. Create Task (without image)
 			const payload = {
 				title: title.trim(),
 				description: description.trim(),
 				category: category.trim(),
-				image: imageUrl,
+				// image is optional now
 			};
 
 			if (Object.keys(locationData).length > 0) {
 				payload.location = locationData;
 			}
 
-			await api.post("/tasks", payload);
+			// This might throw "Please complete your profile" error
+			const taskRes = await api.post("/tasks", payload);
+			const taskId = taskRes.data.task._id;
+
+			// 2. Upload Image (if selected)
+			if (image) {
+				try {
+					const formData = new FormData();
+					formData.append("file", {
+						uri: image,
+						name: "task-image.jpg",
+						type: "image/jpeg",
+					});
+
+					const uploadRes = await api.post("/upload", formData, {
+						headers: { "Content-Type": "multipart/form-data" },
+					});
+					const imageUrl = uploadRes.data.url;
+
+					// 3. Update Task with Image URL
+					await api.patch(`/tasks/${taskId}`, { image: imageUrl });
+				} catch (uploadErr) {
+					console.error("Image upload failed:", uploadErr);
+					// Optional: Alert user that task was created but image failed
+					setMessage(
+						"Task created, but image upload failed. You can add it later."
+					);
+					// Don't return here, let the success message show (or show partial success)
+				}
+			}
+
 			setMessage("Task posted successfully!");
 			setTitle("");
 			setDescription("");
