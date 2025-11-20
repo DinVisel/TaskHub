@@ -23,6 +23,8 @@ import Offer from "./models/Offer.js";
 import Message from "./models/Message.js";
 import reportRoutes from "./routes/reportRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import disputeRoutes from "./routes/disputeRoutes.js";
+import uploadRoutes from "./routes/uploadRoutes.js";
 import { globalLimiter } from "./middleware/rateLimiter.js";
 
 const app = express();
@@ -45,6 +47,8 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/disputes", disputeRoutes);
+app.use("/api/upload", uploadRoutes);
 app.use("/api/wallet", walletRoutes);
 app.use("/api/match", matchRoutes);
 app.use("/api/users", userRoutes);

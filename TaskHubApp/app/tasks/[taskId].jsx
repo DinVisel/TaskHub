@@ -251,10 +251,35 @@ export default function TaskDetail() {
 
                         {!loading && !error ? (
                                 <View style={styles.footer}>
-                                        <TouchableOpacity style={styles.messageButton} onPress={handleMessage}>
-                                                <Ionicons name='chatbubble-ellipses' size={20} color='#fff' />
-                                                <Text style={styles.messageText}>Message about this task</Text>
-                                        </TouchableOpacity>
+                                        {task?.isDisputed ? (
+                                                <View style={styles.disputeBanner}>
+                                                        <Ionicons name='alert-circle' size={20} color='#fff' />
+                                                        <Text style={styles.disputeText}>
+                                                                This task is currently under dispute. Actions are frozen.
+                                                        </Text>
+                                                </View>
+                                        ) : (
+                                                <>
+                                                        <TouchableOpacity
+                                                                style={styles.messageButton}
+                                                                onPress={handleMessage}
+                                                        >
+                                                                <Ionicons name='chatbubble-ellipses' size={20} color='#fff' />
+                                                                <Text style={styles.messageText}>Message</Text>
+                                                        </TouchableOpacity>
+
+                                                        {(task?.status === "in_progress" ||
+                                                                task?.status === "completed") && (
+                                                                        <TouchableOpacity
+                                                                                style={styles.reportButton}
+                                                                                onPress={() => router.push(`/tasks/dispute/${taskId}`)}
+                                                                        >
+                                                                                <Ionicons name='flag' size={20} color={colors.danger} />
+                                                                                <Text style={styles.reportText}>Report Problem</Text>
+                                                                        </TouchableOpacity>
+                                                                )}
+                                                </>
+                                        )}
                                 </View>
                         ) : null}
                 </SafeAreaView>
@@ -416,8 +441,11 @@ const styles = StyleSheet.create({
                 backgroundColor: colors.surface,
                 borderTopWidth: 1,
                 borderTopColor: colors.border,
+                flexDirection: "row",
+                gap: spacing.md,
         },
         messageButton: {
+                flex: 1,
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "center",
@@ -430,5 +458,36 @@ const styles = StyleSheet.create({
                 color: "#fff",
                 fontWeight: "600",
                 fontSize: fonts.body,
+        },
+        reportButton: {
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: spacing.sm,
+                backgroundColor: "#fee2e2",
+                borderRadius: radii.md,
+                paddingHorizontal: spacing.md,
+        },
+        reportText: {
+                color: colors.danger,
+                fontWeight: "600",
+                fontSize: fonts.body,
+        },
+        disputeBanner: {
+                flex: 1,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: spacing.sm,
+                backgroundColor: colors.danger,
+                borderRadius: radii.md,
+                paddingVertical: spacing.md,
+                paddingHorizontal: spacing.md,
+        },
+        disputeText: {
+                color: "#fff",
+                fontWeight: "600",
+                fontSize: 14,
+                flex: 1,
         },
 });

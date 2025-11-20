@@ -59,11 +59,28 @@ export default function EditProfile() {
 		setSuccess("");
 
 		try {
+			let avatarUrl = avatar;
+
+			// If avatar is a local URI (starts with file://), upload it first
+			if (avatar && !avatar.startsWith("http")) {
+				const formData = new FormData();
+				formData.append("file", {
+					uri: avatar,
+					name: "avatar.jpg",
+					type: "image/jpeg",
+				});
+
+				const uploadRes = await api.post("/upload", formData, {
+					headers: { "Content-Type": "multipart/form-data" },
+				});
+				avatarUrl = uploadRes.data.url;
+			}
+
 			const payload = {
 				name: name.trim(),
 				phone: phone.trim(),
 				bio: bio.trim(),
-				avatar: avatar.trim(),
+				avatar: avatarUrl,
 				location: { city: city.trim() },
 			};
 

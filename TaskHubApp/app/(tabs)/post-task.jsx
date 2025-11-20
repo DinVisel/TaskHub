@@ -13,7 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import * as Location from "expo-location";
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
-import api from "../../api/api";
+import api from "../../api/api.js";
 import { colors, spacing, fonts, radii, shadow } from "../../theme";
 
 export default function PostTask() {

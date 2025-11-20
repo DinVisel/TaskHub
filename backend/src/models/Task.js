@@ -47,6 +47,7 @@ const taskSchema = new mongoose.Schema(
 		},
 		paid: { type: Boolean, default: false },
 		commissionRate: { type: Number, default: 0.1 },
+		isDisputed: { type: Boolean, default: false },
 	},
 	{ timestamps: true }
 );

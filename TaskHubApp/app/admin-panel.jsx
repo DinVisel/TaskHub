@@ -38,10 +38,16 @@ export default function AdminPanel() {
 	const [refreshing, setRefreshing] = useState(false);
 
 	// Data states
-	const [analytics, setAnalytics] = useState(null);
+	const [stats, setStats] = useState({
+		totalUsers: 0,
+		totalTasks: 0,
+		totalRevenue: 0,
+		activeDisputes: 0,
+	});
 	const [users, setUsers] = useState([]);
 	const [tasks, setTasks] = useState([]);
 	const [reviews, setReviews] = useState([]);
+	const [disputes, setDisputes] = useState([]);
 	const [flaggedUsers, setFlaggedUsers] = useState([]);
 	const [riskyJobs, setRiskyJobs] = useState([]);
 	const [securityLogs, setSecurityLogs] = useState([]);
@@ -62,20 +68,31 @@ export default function AdminPanel() {
 
 	const fetchData = useCallback(async () => {
 		try {
-			const [analyticsRes, usersRes, tasksRes, reviewsRes] = await Promise.all([
-				api.get("/admin/analytics"),
+			setLoading(true);
+			const [usersRes, tasksRes, reviewsRes, disputesRes] = await Promise.all([
 				api.get("/admin/users"),
 				api.get("/admin/tasks"),
 				api.get("/admin/reviews"),
+				api.get("/disputes"),
 			]);
-			setAnalytics(analyticsRes.data);
-			setUsers(usersRes.data);
-			setTasks(tasksRes.data);
-			setReviews(reviewsRes.data);
-		} catch (err) {
-			Alert.alert("Error", err.response?.data?.message || "Failed to fetch data");
+
+			setUsers(usersRes.data.data.users);
+			setTasks(tasksRes.data.data.tasks);
+			setReviews(reviewsRes.data.data.reviews);
+			setDisputes(disputesRes.data.data.disputes);
+
+			setStats({
+				totalUsers: usersRes.data.results,
+				totalTasks: tasksRes.data.results,
+				totalRevenue: 12500, // Mock revenue
+				activeDisputes: disputesRes.data.results,
+			});
+		} catch (error) {
+			Alert.alert("Error", "Failed to fetch admin data");
+			console.error(error);
 		} finally {
 			setLoading(false);
+			setRefreshing(false);
 		}
 	}, []);
 

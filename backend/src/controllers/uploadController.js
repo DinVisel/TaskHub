@@ -1,37 +1,39 @@
-import { supabase } from "../utils/supabaseClient.js";
-import asyncHandler from "../utils/asyncHandler.js";
-import AppError from "../utils/appError.js";
 import multer from "multer";
-import fs from "fs";
+import { uploadFile } from "../services/storageService.js";
+import AppError from "../utils/appError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
-const upload = multer({ dest: "uploads/" }); // temp folder
+// Configure multer for memory storage
+const storage = multer.memoryStorage();
 
-export const uploadMiddleware = upload.single("file");
+const fileFilter = (req, file, cb) => {
+	if (file.mimetype.startsWith("image/")) {
+		cb(null, true);
+	} else {
+		cb(new AppError("Not an image! Please upload only images.", 400), false);
+	}
+};
 
-// POST /api/upload
-export const uploadFile = asyncHandler(async (req, res, next) => {
-	if (!req.file) return next(new AppError("No file uploaded", 400));
+export const upload = multer({
+	storage,
+	fileFilter,
+	limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+});
 
-	const filePath = req.file.path;
-	const fileExt = req.file.originalname.split(".").pop();
-	const fileName = `${Date.now()}.${fileExt}`;
+export const uploadImage = asyncHandler(async (req, res) => {
+	if (!req.file) {
+		throw new AppError("No file uploaded", 400);
+	}
 
-	const { data, error } = await supabase.storage
-		.from("taskhub-files")
-		.upload(fileName, fs.createReadStream(filePath), {
-			contentType: req.file.mimetype,
-			duplex: "half",
-		});
+	const file = req.file;
+	const publicUrl = await uploadFile(
+		file.buffer,
+		file.originalname,
+		file.mimetype
+	);
 
-	fs.unlinkSync(filePath); // cleanup
-
-	if (error) return next(new AppError(error.message, 500));
-
-	const publicUrl = supabase.storage.from("taskhub-files").getPublicUrl(fileName)
-		.data.publicUrl;
-
-	res.status(200).json({
-		success: true,
+	res.status(201).json({
+		status: "success",
 		url: publicUrl,
 	});
 });
