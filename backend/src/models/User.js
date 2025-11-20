@@ -22,6 +22,7 @@ const userSchema = new mongoose.Schema(
                 passwordHash: { type: String, required: true, select: false },
                 bio: { type: String, default: "" },
                 identification: { type: String, trim: true, default: "" },
+		trustedDevices: [{ type: String }],
 		location: {
 			city: { type: String, trim: true },
 			coordinates: {
