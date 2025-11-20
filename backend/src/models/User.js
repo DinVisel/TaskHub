@@ -60,9 +60,22 @@ const userSchema = new mongoose.Schema(
 				},
 			},
 		],
+	profileCompleted: { type: Boolean, default: false },
 	},
 	{ timestamps: true }
 );
+
+// Pre-save hook to auto-calculate profile completeness
+userSchema.pre("save", function (next) {
+	// Check mandatory fields: name, avatar, city, bio
+	const hasName = Boolean(this.name && this.name.trim());
+	const hasAvatar = Boolean(this.avatar && this.avatar.trim());
+	const hasCity = Boolean(this.location?.city && this.location.city.trim());
+	const hasBio = Boolean(this.bio && this.bio.trim());
+
+	this.profileCompleted = hasName && hasAvatar && hasCity && hasBio;
+	next();
+});
 
 // optional: expose a safe version for responses
 userSchema.methods.toSafeObject = function () {
@@ -96,7 +109,8 @@ userSchema.methods.toSafeObject = function () {
                 preferences,
                 role,
                 trustScore,
-                hasIdentification: Boolean(identification),
+		profileCompleted: this.profileCompleted,
+		hasIdentification: Boolean(identification),
         };
 };
 
