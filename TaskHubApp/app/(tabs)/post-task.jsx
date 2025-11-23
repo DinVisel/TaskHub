@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Location from "expo-location";
+import MapView, { Marker } from "react-native-maps";
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
 import api from "../../api/api.js";
@@ -24,6 +25,7 @@ export default function PostTask() {
 	const [coords, setCoords] = useState(null);
 	const [category, setCategory] = useState("");
 	const [image, setImage] = useState(null);
+	const [region, setRegion] = useState(null);
 	const [submitting, setSubmitting] = useState(false);
 
 	const handlePost = async () => {
@@ -91,6 +93,7 @@ export default function PostTask() {
 			setCategory("");
 			setCity("");
 			setImage(null);
+			setCoords(null);
 		} catch (err) {
 			setMessage(err.response?.data?.message || "Failed to post task");
 		} finally {
@@ -115,12 +118,24 @@ export default function PostTask() {
 			const { status } = await Location.requestForegroundPermissionsAsync();
 			if (status !== "granted") return;
 			const location = await Location.getCurrentPositionAsync({});
-			setCoords({
+			const newCoords = {
 				lat: location.coords.latitude,
 				lng: location.coords.longitude,
+			};
+			setCoords(newCoords);
+			setRegion({
+				latitude: location.coords.latitude,
+				longitude: location.coords.longitude,
+				latitudeDelta: 0.05,
+				longitudeDelta: 0.05,
 			});
 		})();
 	}, []);
+
+	const handleMapPress = (e) => {
+		const { latitude, longitude } = e.nativeEvent.coordinate;
+		setCoords({ lat: latitude, lng: longitude });
+	};
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
@@ -168,6 +183,26 @@ export default function PostTask() {
 						numberOfLines={4}
 					/>
 
+					<Text style={styles.label}>Location</Text>
+					<View style={styles.mapContainer}>
+						<MapView
+							style={styles.map}
+							region={region}
+							onRegionChangeComplete={setRegion}
+							onPress={handleMapPress}
+							showsUserLocation
+							showsMyLocationButton
+						>
+							{coords && (
+								<Marker
+									coordinate={{ latitude: coords.lat, longitude: coords.lng }}
+									title='Task Location'
+								/>
+							)}
+						</MapView>
+						<Text style={styles.hint}>Tap on the map to set precise location</Text>
+					</View>
+
 					<TouchableOpacity style={styles.outlineButton} onPress={pickImage}>
 						<Text style={styles.outlineButtonText}>
 							{image ? "Change image" : "Add a reference image"}
@@ -209,6 +244,7 @@ const styles = StyleSheet.create({
 	content: {
 		padding: spacing.lg,
 		gap: spacing.lg,
+		paddingBottom: 85,
 	},
 	hero: {
 		borderRadius: radii.lg,
@@ -289,4 +325,33 @@ const styles = StyleSheet.create({
 	},
 	success: { color: colors.success },
 	error: { color: colors.danger },
+	label: {
+		fontSize: fonts.body,
+		fontWeight: "600",
+		color: colors.text,
+		marginTop: spacing.sm,
+	},
+	mapContainer: {
+		height: 200,
+		borderRadius: radii.md,
+		overflow: "hidden",
+		borderWidth: 1,
+		borderColor: colors.border,
+	},
+	map: {
+		flex: 1,
+	},
+	hint: {
+		position: "absolute",
+		bottom: spacing.xs,
+		left: spacing.xs,
+		right: spacing.xs,
+		backgroundColor: "rgba(255,255,255,0.8)",
+		padding: spacing.xs,
+		borderRadius: radii.sm,
+		fontSize: fonts.caption,
+		color: colors.subtext,
+		textAlign: "center",
+		overflow: "hidden",
+	},
 });

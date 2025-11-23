@@ -33,7 +33,7 @@ export default function Account() {
 			if (showLoader) setLoading(true);
 			try {
 				const [reviewsRes, walletRes] = await Promise.all([
-					api.get(`/reviews/user/${userId}`),
+					api.get(`/reviews/${userId}`),
 					api.get("/wallet"),
 				]);
 
