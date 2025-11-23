@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import "../i18n/i18n";
 import { Stack } from "expo-router";
 import { AuthProvider, AuthContext } from "../context/AuthContext";
 // import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -17,23 +18,27 @@ function AuthenticatedStack() {
 		);
 	}
 
-        return (
-                <Stack screenOptions={{ headerShown: false }}>
-                        <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
-                        <Stack.Screen name='edit-profile' options={{ headerShown: false }} />
-                        <Stack.Screen name='tasks/[taskId]' options={{ headerShown: false }} />
-                </Stack>
-        );
+	return (
+		<Stack screenOptions={{ headerShown: false }}>
+			<Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+			<Stack.Screen name='edit-profile' options={{ headerShown: false }} />
+			<Stack.Screen name='tasks/[taskId]' options={{ headerShown: false }} />
+		</Stack>
+	);
 }
 
 import { NotificationProvider } from "../context/NotificationContext";
 
+import { ThemeProvider } from "../context/ThemeContext";
+
 export default function RootLayout() {
 	return (
-		<NotificationProvider>
-			<AuthProvider>
-				<AuthenticatedStack />
-			</AuthProvider>
-		</NotificationProvider>
+		<ThemeProvider>
+			<NotificationProvider>
+				<AuthProvider>
+					<AuthenticatedStack />
+				</AuthProvider>
+			</NotificationProvider>
+		</ThemeProvider>
 	);
 }

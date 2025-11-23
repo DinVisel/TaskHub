@@ -1,4 +1,4 @@
-export const colors = {
+export const lightColors = {
 	primary: "#2563EB",
 	secondary: "#60A5FA",
 	accent: "#F97316",
@@ -11,6 +11,23 @@ export const colors = {
 	success: "#16A34A",
 	danger: "#DC2626",
 };
+
+export const darkColors = {
+	primary: "#3B82F6", // Lighter blue for dark mode
+	secondary: "#60A5FA",
+	accent: "#FB923C",
+	background: "#0F172A", // Dark slate
+	surface: "#1E293B", // Lighter slate
+	card: "#1E293B",
+	text: "#F1F5F9", // Light gray text
+	subtext: "#94A3B8",
+	border: "rgba(148, 163, 184, 0.2)",
+	success: "#22C55E",
+	danger: "#EF4444",
+};
+
+// Default export for backward compatibility (Light mode)
+export const colors = lightColors;
 
 export const spacing = {
 	xs: 4,

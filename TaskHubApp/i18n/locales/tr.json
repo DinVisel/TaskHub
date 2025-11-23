@@ -1,0 +1,17 @@
+{
+	"welcome": "TaskHub'a Hoşgeldiniz",
+	"login": "Giriş Yap",
+	"signup": "Kayıt Ol",
+	"dashboard": "Panel",
+	"profile": "Profil",
+	"tasks": "Görevler",
+	"messages": "Mesajlar",
+	"settings": "Ayarlar",
+	"language": "Dil",
+	"theme": "Tema",
+	"dark_mode": "Karanlık Mod",
+	"light_mode": "Aydınlık Mod",
+	"system_default": "Sistem Varsayılanı",
+	"notifications": "Bildirimler",
+	"enable_notifications": "Bildirimleri Aç"
+}

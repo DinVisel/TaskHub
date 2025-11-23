@@ -133,6 +133,13 @@ export default function Account() {
 					<View style={styles.actions}>
 						<TouchableOpacity
 							style={styles.actionButton}
+							onPress={() => router.push("/settings")}
+						>
+							<Text style={styles.actionText}>⚙️ Settings</Text>
+						</TouchableOpacity>
+
+						<TouchableOpacity
+							style={styles.actionButton}
 							onPress={() => router.push("/edit-profile")}
 						>
 							<Text style={styles.actionText}>✏️ Edit profile</Text>

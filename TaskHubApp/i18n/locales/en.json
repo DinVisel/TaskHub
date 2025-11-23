@@ -1,0 +1,17 @@
+{
+	"welcome": "Welcome to TaskHub",
+	"login": "Login",
+	"signup": "Sign Up",
+	"dashboard": "Dashboard",
+	"profile": "Profile",
+	"tasks": "Tasks",
+	"messages": "Messages",
+	"settings": "Settings",
+	"language": "Language",
+	"theme": "Theme",
+	"dark_mode": "Dark Mode",
+	"light_mode": "Light Mode",
+	"system_default": "System Default",
+	"notifications": "Notifications",
+	"enable_notifications": "Enable Notifications"
+}
