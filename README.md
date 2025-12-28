@@ -1,101 +1,120 @@
 # TaskHub
 
-TaskHub is a comprehensive task management and marketplace application designed to connect users who need tasks done with those who can perform them. It features real-time updates, geolocation services, and a secure environment for transactions.
+**TaskHub** is a next-generation mobile marketplace connecting users with local task-runners. Unlike standard gig apps, TaskHub prioritizes **Trust & Safety** through an advanced, automated behavioral analysis engine.
 
-## Features
+Built with **React Native (Expo)** and a **Node.js (Express 5)** backend, this project demonstrates scalable architecture, real-time features, and security-first engineering.
 
-- **Task Management**: Post, browse, and manage tasks easily.
-- **Real-time Updates**: Instant notifications and status updates using Socket.io.
-- **Geolocation**: Find tasks or workers near you.
-- **Secure Authentication**: Robust user authentication and authorization.
-- **Multi-language Support**: Available in multiple languages (English, Turkish, etc.).
-- **Dark/Light Mode**: Customizable user interface themes.
-- **Dispute Resolution**: Integrated system for handling task disputes.
+---
 
-## Tech Stack
+## 🚀 Why This Project Stands Out
 
-### Frontend (Mobile App)
+Beyond standard CRUD features, TaskHub implements complex business logic and security mechanisms found in enterprise-level applications:
 
-- **Framework**: React Native with Expo
-- **Navigation**: React Navigation
-- **State/Data**: Supabase, Axios
-- **Styling**: Expo System UI, Vector Icons
-- **Internationalization**: i18next
-- **Maps**: React Native Maps
+### 🛡️ 1. Trust & Reliability Engine
+The system doesn't just store users; it actively assigns a **Trust Score** to every participant based on behavioral signals:
+- **Automated Penalties:** Automatically degrades score for suspicious activity (e.g., creating 3+ accounts from the same IP).
+- **Verified Status:** Higher trust scores unlock "Pro" and "Verified" badges.
+- **Dispute Resolution:** Integrated workflow for handling task disputes and arbitration.
 
-### Backend (API)
+### 🔒 2. Advanced Security Layer
+Implements "invisible" security features to protect the marketplace:
+- **Device Fingerprinting:** Tracks unique `device-id` to detect account farming.
+- **Security Logging:** automatically logs critical security events (e.g., `DEVICE_MISMATCH` when a login occurs from a new device).
+- **IP Mismatch Detection:** Alerts the system when a user's location abruptly changes, preventing account takeovers.
 
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Database**: MongoDB with Mongoose
-- **Real-time**: Socket.io
-- **Authentication**: JSON Web Tokens (JWT), bcrypt
-- **File Storage**: Supabase Storage
+### 📊 3. Comprehensive Admin Dashboard
+A feature-rich administrative portal included in the app:
+- **Real-time Analytics:** Charts covering revenue, task completion rates, and user growth.
+- **Risk Management:** Dedicated view for "Risky Jobs" and "Flagged Users" requiring manual review.
+- **User Management:** Granular control to ban users, adjust trust scores, or resolve disputes.
 
-## Project Structure
+---
 
-The project is divided into two main directories:
+## 🛠️ Tech Stack
 
-- **`TaskHubApp/`**: Contains the frontend React Native (Expo) application code.
-- **`backend/`**: Contains the backend Node.js/Express API code.
+### Mobile Frontend (`/TaskHubApp`)
+*   **Framework:** React Native 0.81 with **Expo 54**
+*   **Routing:** **Expo Router** (File-based routing)
+*   **UI/UX:** Reanimated 3, Linear Gradient, Lottie Animations
+*   **Maps:** `react-native-maps` with geolocation clustering
+*   **State:** Context API + Persistent Storage
+*   **Real-time:** `socket.io-client` for live chat and status updates
 
-## Getting Started
+### Backend API (`/backend`)
+*   **Runtime:** **Node.js** (ES Modules enabled)
+*   **Framework:** **Express 5.0** (Leveraging modern async/await handling)
+*   **Database:** 
+    *   **MongoDB** (Mongoose v8) for core application data.
+    *   **Supabase** for Auth integration and file storage.
+*   **Security:** `bcryptjs` for hashing, `jsonwebtoken`, custom Rate Limiting.
+*   **Testing:** **Jest** (Unit/Integration) and **k6** (Load Testing).
+
+---
+
+## 📂 Project Structure
+
+```
+.
+├── TaskHubApp/          # React Native Expo Frontend
+│   ├── app/             # Expo Router screens
+│   ├── components/      # Reusable UI components
+│   └── api/             # Axios interceptors & endpoints
+│
+├── backend/             # Node.js Express API
+│   ├── src/
+│   │   ├── controllers/ # Business logic
+│   │   ├── models/      # Mongoose Schemas (User, Task, TrustScore)
+│   │   ├── services/    # Email, Storage, TrustScore logic
+│   │   └── middleware/  # Auth & Security checks
+│   └── Dockerfile       # Containerization setup
+```
+
+---
+
+## ⚡ Getting Started
 
 ### Prerequisites
+*   Node.js v20+ (Required for modern dependencies)
+*   MongoDB Instance (Local or Atlas)
+*   Supabase Account (for Storage/Auth keys)
 
-- [Node.js](https://nodejs.org/) (v14 or later recommended)
-- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
-- [Expo Go](https://expo.dev/client) app on your mobile device (for testing)
-- [MongoDB](https://www.mongodb.com/) instance (local or cloud)
+### 1. Backend Setup
+```bash
+cd backend
+npm install
 
-### Installation
+# Create .env file
+# PORT=5000
+# MONGO_URI=mongodb://localhost:27017/taskhub
+# JWT_SECRET=super_secret_key
+# SUPABASE_URL=...
 
-1. **Clone the repository:**
+npm run dev
+```
 
-   ```bash
-   git clone https://github.com/yourusername/TaskHub.git
-   cd TaskHub
-   ```
+### 2. Mobile App Setup
+```bash
+cd TaskHubApp
+npm install
+npx expo start
+```
+*   Scan the QR code with **Expo Go** on your phone or run on an Emulator.
 
-2. **Backend Setup:**
+---
 
-   ```bash
-   cd backend
-   npm install
-   ```
+## 🧪 Testing
 
-   - Create a `.env` file in the `backend` directory with the following variables (example):
-     ```env
-     PORT=5000
-     MONGO_URI=your_mongodb_connection_string
-     JWT_SECRET=your_jwt_secret
-     SUPABASE_URL=your_supabase_url
-     SUPABASE_KEY=your_supabase_key
-     ```
-   - Start the backend server:
-     ```bash
-     npm run dev
-     ```
+The backend includes a suite of tests to verify reliability:
 
-3. **Frontend Setup:**
-   - Open a new terminal window and navigate to the app directory:
-     ```bash
-     cd TaskHubApp
-     npm install
-     ```
-   - Create a `.env` file in the `TaskHubApp` directory if necessary (refer to project config).
-   - Start the Expo development server:
-     ```bash
-     npx expo start
-     ```
-   - Scan the QR code with the Expo Go app on your phone.
+```bash
+# Run Unit & Integration Tests
+cd backend
+npm test
 
-## Contributing
+# Run Load Tests (k6)
+k6 run loadtest.js
+```
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+---
 
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+*This project was built to demonstrate full-stack proficiency, focusing on security, scalability, and polished user experience.*
