@@ -5,22 +5,35 @@
 	"type": "module",
 	"scripts": {
 		"dev": "nodemon src/server.js",
-		"start": "node src/server.js"
+		"start": "node src/server.js",
+		"test": "NODE_OPTIONS=--experimental-vm-modules NODE_ENV=test jest --detectOpenHandles --forceExit",
+		"seed:test": "node src/scripts/resetTestData.js"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"description": "",
 	"dependencies": {
+		"@supabase/supabase-js": "^2.84.0",
 		"bcrypt": "^6.0.0",
+		"bcryptjs": "^3.0.2",
 		"cors": "^2.8.5",
 		"dotenv": "^17.2.3",
+		"expo-server-sdk": "^4.0.0",
 		"express": "^5.1.0",
+		"express-rate-limit": "^8.2.1",
+		"geolib": "^3.3.4",
 		"jsonwebtoken": "^9.0.2",
+		"k6": "^0.0.0",
 		"mongodb": "^6.20.0",
-		"mongoose": "^8.19.1"
+		"mongoose": "^8.19.1",
+		"multer": "^2.0.2",
+		"nodemailer": "^7.0.10",
+		"socket.io": "^4.8.1"
 	},
 	"devDependencies": {
-		"nodemon": "^3.1.10"
+		"jest": "^30.2.0",
+		"nodemon": "^3.1.10",
+		"supertest": "^7.1.4"
 	}
 }
